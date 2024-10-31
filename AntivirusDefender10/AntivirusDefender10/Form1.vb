@@ -591,15 +591,12 @@ Public Class Form1
                 UpdateRegistryKey(Registry.ClassesRoot, regKey, iconPath)
             Next
 
-            ' Optionally refresh Windows Explorer to reflect changes
-            Process.Start("explorer.exe", "/select," & iconIcoPath)
-
         Catch ex As Exception
             MessageBox.Show("An error occurred while updating file icons: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
-    Private Sub UpdateRegistryKey(baseHive As RegistryKey, subKey As String, value As String)
+    Private Sub UpdateRegistryKey(baseHive As RegistryKey, subKey As String, iconPath As String)
         Try
             ' Get the path to the parent key and the value name
             Dim lastIndex As Integer = subKey.LastIndexOf("\")
@@ -608,18 +605,10 @@ Public Class Form1
             Dim keyPath As String = subKey.Substring(0, lastIndex)
             Dim valueName As String = subKey.Substring(lastIndex + 1)
 
-            ' Try to open the parent key with write access
-            Using key As RegistryKey = baseHive.OpenSubKey(keyPath, True)
-                If key Is Nothing Then
-                    ' The key does not exist, so attempt to create it
-                    Using newKey As RegistryKey = baseHive.CreateSubKey(keyPath, True)
-                        ' Set the value for the new subkey
-                        newKey.SetValue(valueName, value, RegistryValueKind.String)
-                    End Using
-                Else
-                    ' Key exists, setting the value
-                    key.SetValue(valueName, value, RegistryValueKind.String)
-                End If
+            ' Create or open the parent key with write access
+            Using key As RegistryKey = baseHive.CreateSubKey(keyPath, True)
+                ' Directly set the value for the new subkey, overwriting any existing value
+                key.SetValue(valueName, iconPath, RegistryValueKind.String)
             End Using
 
             ' Lock the registry key path
