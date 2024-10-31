@@ -1,0 +1,1 @@
+nasm -f bin antivirusdefendermbr.asm -o antivirusdefendermbr.bin
