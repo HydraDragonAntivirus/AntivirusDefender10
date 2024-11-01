@@ -21,7 +21,6 @@ Public Class Form1
     Private headerPanel As Panel
     Private footerPanel As Panel
     Private antivirusdefenderImage As Image
-    Private portalEffectPhase As Single = 0.0F ' Phase for wavy distortion
     Private random As New Random()
     ' Constants for keyboard hook
     Private Const WH_KEYBOARD_LL As Integer = 13
@@ -324,8 +323,8 @@ Public Class Form1
         End Sub
 
         ' Function to prompt user for a choice using a MessageBox
-        Private Function PromptUserForChoice(message As String, options As String()) As String
-            Dim result As DialogResult = MessageBox.Show(message, "Choose an Option", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
+        Private Function PromptUserForChoice(messaage As String, options As String()) As String
+            Dim result As DialogResult = MessageBox.Show(messaage, "Choose an Option", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
 
             If result = DialogResult.OK Then
                 ' Create a simple input dialog
@@ -406,7 +405,7 @@ Public Class Form1
                 Next
 
             Catch ex As Exception
-                ' Handle exceptions, e.g., log the error or display a message
+                ' Handle exception, display a message
                 MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
