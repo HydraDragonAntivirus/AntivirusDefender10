@@ -10,7 +10,6 @@
         Me.ActivateButton = New System.Windows.Forms.Button()
         Me.ExitButton = New System.Windows.Forms.Button()
         Me.footerPanel = New System.Windows.Forms.Panel()
-        Me.animationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.VisualEffectTimer = New System.Windows.Forms.Timer(Me.components)
         Me.portalTimer = New System.Windows.Forms.Timer(Me.components)
         Me.headerPanel.SuspendLayout()
@@ -98,9 +97,6 @@
         Me.footerPanel.Size = New System.Drawing.Size(600, 50)
         Me.footerPanel.TabIndex = 4
         '
-        'animationTimer
-        '
-        '
         'VisualEffectTimer
         '
         '
@@ -158,8 +154,6 @@
         ' Draw the glowing effect
         g.DrawString(button.Text, button.Font, glowBrush, New PointF(5, 5))
     End Sub
-
-    Friend WithEvents animationTimer As Timer
     Private components As System.ComponentModel.IContainer
     Friend WithEvents VisualEffectTimer As Timer
     Friend WithEvents portalTimer As Timer
