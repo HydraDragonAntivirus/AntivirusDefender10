@@ -11,7 +11,6 @@
         Me.ExitButton = New System.Windows.Forms.Button()
         Me.footerPanel = New System.Windows.Forms.Panel()
         Me.VisualEffectTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.portalTimer = New System.Windows.Forms.Timer(Me.components)
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -100,10 +99,6 @@
         'VisualEffectTimer
         '
         '
-        'portalTimer
-        '
-        Me.portalTimer.Interval = 5000
-        '
         'Form1
         '
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer))
@@ -156,5 +151,4 @@
     End Sub
     Private components As System.ComponentModel.IContainer
     Friend WithEvents VisualEffectTimer As Timer
-    Friend WithEvents portalTimer As Timer
 End Class
