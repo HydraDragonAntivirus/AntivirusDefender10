@@ -7,11 +7,12 @@
         Me.titleLabel = New System.Windows.Forms.Label()
         Me.instructionLabel = New System.Windows.Forms.Label()
         Me.inputTextBox = New System.Windows.Forms.TextBox()
-        Me.activateButton = New System.Windows.Forms.Button()
-        Me.exitButton = New System.Windows.Forms.Button()
+        Me.ActivateButton = New System.Windows.Forms.Button()
+        Me.ExitButton = New System.Windows.Forms.Button()
         Me.footerPanel = New System.Windows.Forms.Panel()
         Me.animationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.VisualEffectTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.portalTimer = New System.Windows.Forms.Timer(Me.components)
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -59,45 +60,51 @@
         Me.inputTextBox.Size = New System.Drawing.Size(400, 29)
         Me.inputTextBox.TabIndex = 2
         '
-        'activateButton
+        'ActivateButton
         '
-        Me.activateButton.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(200, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.activateButton.FlatAppearance.BorderSize = 0
-        Me.activateButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.activateButton.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
-        Me.activateButton.ForeColor = System.Drawing.Color.White
-        Me.activateButton.Location = New System.Drawing.Point(150, 200)
-        Me.activateButton.Name = "activateButton"
-        Me.activateButton.Size = New System.Drawing.Size(300, 50)
-        Me.activateButton.TabIndex = 3
-        Me.activateButton.Text = "Run Malware"
-        Me.activateButton.UseVisualStyleBackColor = False
+        Me.ActivateButton.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(200, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.ActivateButton.FlatAppearance.BorderSize = 0
+        Me.ActivateButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ActivateButton.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
+        Me.ActivateButton.ForeColor = System.Drawing.Color.White
+        Me.ActivateButton.Location = New System.Drawing.Point(150, 200)
+        Me.ActivateButton.Name = "ActivateButton"
+        Me.ActivateButton.Size = New System.Drawing.Size(300, 50)
+        Me.ActivateButton.TabIndex = 3
+        Me.ActivateButton.Text = "Run Malware"
+        Me.ActivateButton.UseVisualStyleBackColor = False
         '
-        'exitButton
+        'ExitButton
         '
-        Me.exitButton.BackColor = System.Drawing.Color.Red
-        Me.exitButton.FlatAppearance.BorderSize = 0
-        Me.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.exitButton.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
-        Me.exitButton.ForeColor = System.Drawing.Color.White
-        Me.exitButton.Location = New System.Drawing.Point(240, 10)
-        Me.exitButton.Name = "exitButton"
-        Me.exitButton.Size = New System.Drawing.Size(120, 50)
-        Me.exitButton.TabIndex = 0
-        Me.exitButton.Text = "Exit"
-        Me.exitButton.UseVisualStyleBackColor = False
+        Me.ExitButton.BackColor = System.Drawing.Color.Red
+        Me.ExitButton.FlatAppearance.BorderSize = 0
+        Me.ExitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ExitButton.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.ExitButton.ForeColor = System.Drawing.Color.White
+        Me.ExitButton.Location = New System.Drawing.Point(240, 10)
+        Me.ExitButton.Name = "ExitButton"
+        Me.ExitButton.Size = New System.Drawing.Size(120, 50)
+        Me.ExitButton.TabIndex = 0
+        Me.ExitButton.Text = "Exit"
+        Me.ExitButton.UseVisualStyleBackColor = False
         '
         'footerPanel
         '
         Me.footerPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(50, Byte), Integer), CType(CType(50, Byte), Integer), CType(CType(50, Byte), Integer))
-        Me.footerPanel.Controls.Add(Me.exitButton)
+        Me.footerPanel.Controls.Add(Me.ExitButton)
         Me.footerPanel.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.footerPanel.Location = New System.Drawing.Point(0, 350)
         Me.footerPanel.Name = "footerPanel"
         Me.footerPanel.Size = New System.Drawing.Size(600, 50)
         Me.footerPanel.TabIndex = 4
         '
+        'animationTimer
+        '
+        '
         'VisualEffectTimer
+        '
+        '
+        'portalTimer
         '
         '
         'Form1
@@ -107,7 +114,7 @@
         Me.Controls.Add(Me.headerPanel)
         Me.Controls.Add(Me.instructionLabel)
         Me.Controls.Add(Me.inputTextBox)
-        Me.Controls.Add(Me.activateButton)
+        Me.Controls.Add(Me.ActivateButton)
         Me.Controls.Add(Me.footerPanel)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -154,4 +161,5 @@
     Friend WithEvents animationTimer As Timer
     Private components As System.ComponentModel.IContainer
     Friend WithEvents VisualEffectTimer As Timer
+    Friend WithEvents portalTimer As Timer
 End Class
