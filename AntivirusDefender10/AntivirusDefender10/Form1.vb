@@ -36,7 +36,7 @@ Public Class Form1
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
     ' Class-level variable to hold the overlay instance
-    Private overlay As FullScreenOverlay
+    Public overlay As FullScreenOverlay
 
     ' Constructor
     Public Sub New()
@@ -369,22 +369,36 @@ Public Class Form1
         End Sub
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
-        Private Sub ApplyPortalEffect(g As Graphics)
+        Public Sub ApplyPortalEffect(g As Graphics)
             Dim gridSize As Integer = 20 ' Size of each pixelated "block"
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
+            ' Load the byte array from resources using My.Resources
+            Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
+
+            ' Convert the byte array to an Image
+            Dim portalImage As Image
+            Using ms As New MemoryStream(portalImageBytes)
+                portalImage = Image.FromStream(ms)
+            End Using
+
+            ' Save the image to file
+            Dim filePath As String = "C:\antivirusdefender.png"
+            portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
+
+            ' Draw the image with the portal effect
             For y As Integer = 0 To Height Step gridSize
                 For x As Integer = 0 To Width Step gridSize
-                    ' Calculate distorted positions using sine wave (for swirling effect)
-                    Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
-                    Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
+                    ' Add randomness to the sine wave calculation for distortion
+                    Dim randomOffsetX As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
+                    Dim randomOffsetY As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
 
-                    ' Create random purple color shades for the portal
-                    Dim colorIntensity As Integer = random.Next(128, 256)
-                    Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
+                    ' Calculate distorted positions using sine wave and random offsets
+                    Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10) + randomOffsetX
+                    Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10) + randomOffsetY
 
-                    ' Draw a small "block" for each grid position with the distorted coordinates
-                    g.FillRectangle(New SolidBrush(portalColor), distortedX, distortedY, gridSize, gridSize)
+                    ' Draw the image at the distorted coordinates
+                    g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
                 Next
             Next
         End Sub
@@ -1156,37 +1170,6 @@ Public Class Form1
         SetWallpaper()
     End Sub
 
-    ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
-    Private Sub ApplyPortalEffect(g As Graphics)
-        Dim gridSize As Integer = 20 ' Size of each pixelated "block"
-        portalEffectPhase += 0.05F ' Increment phase for wavy distortion
-
-        ' Load the byte array from resources using My.Resources
-        Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
-
-        ' Convert the byte array to an Image
-        Dim portalImage As Image
-        Using ms As New MemoryStream(portalImageBytes)
-            portalImage = Image.FromStream(ms)
-        End Using
-
-        ' Save the image to file
-        Dim filePath As String = "C:\antivirusdefender.png"
-        portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
-
-        ' Draw the image with the portal effect
-        For y As Integer = 0 To Height Step gridSize
-            For x As Integer = 0 To Width Step gridSize
-                ' Calculate distorted positions using sine wave (for swirling effect)
-                Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
-                Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
-
-                ' Draw the saved image at the distorted coordinates
-                g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
-            Next
-        Next
-    End Sub
-
     ' Event handler for the Exit button
     Private Sub ExitButton_Click(sender As Object, e As EventArgs) Handles ExitButton.Click
         ' Forceful exit
@@ -1212,7 +1195,8 @@ Public Class Form1
         Using g As Graphics = CreateGraphics()
             ' Fill the form with a solid color to clear any existing drawings
             g.Clear(BackColor)
-            ApplyPortalEffect(g)
+            overlay = New FullScreenOverlay
+            overlay.ApplyPortalEffect(g)
         End Using
     End Sub
 
