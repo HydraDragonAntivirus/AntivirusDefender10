@@ -291,9 +291,6 @@ Public Class Form1
                 Dim g As Graphics = CreateGraphics()
                 g.SmoothingMode = SmoothingMode.None
 
-                ' Draw portal effect first
-                ApplyPortalEffect(g)
-
                 ' Update the countdown timer label
                 If countdownTime > 0 Then
                     countdownTime -= 1
