@@ -1047,7 +1047,7 @@ Public Class Form1
             SendKeys.SendWait(message)
 
         Catch ex As Exception
-            MessageBox.Show("Failed to write message to Notepad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.Write("Failed to write message to Notepad: " & ex.Message)
         End Try
     End Sub
 
