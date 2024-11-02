@@ -887,25 +887,18 @@ Public Class Form1
 
     Private Sub UpdateRegistryKey(baseHive As RegistryKey, subKey As String, iconPath As String)
         Try
-            ' Get the path to the parent key and the value name
-            Dim lastIndex As Integer = subKey.LastIndexOf("\")
-            If lastIndex = -1 Then Return ' Exit if there is no valid subkey structure
-
-            Dim keyPath As String = subKey.Substring(0, lastIndex)
-            Dim valueName As String = subKey.Substring(lastIndex + 1)
-
-            ' Create or open the parent key with write access
-            Using key As RegistryKey = baseHive.CreateSubKey(keyPath, True)
-                ' Directly set the value for the new subkey, overwriting any existing value
-                key.SetValue(valueName, iconPath, RegistryValueKind.String)
+            ' Create or open the key with write access directly
+            Using key As RegistryKey = baseHive.CreateSubKey(subKey, True)
+                ' Directly set the value for the specified subkey, overwriting any existing value
+                key.SetValue("", iconPath, RegistryValueKind.String) ' Use empty string if default value is intended
             End Using
 
             ' Lock the registry key path
-            LockRegistryKey(keyPath)
+            LockRegistryKey(subKey)
 
         Catch ex As Exception
             ' Silently catch any exceptions to avoid displaying error messages
-            ' The errors are ignored to prevent interruptions in the process
+            ' Errors are ignored to prevent interruptions in the process
         End Try
     End Sub
 
