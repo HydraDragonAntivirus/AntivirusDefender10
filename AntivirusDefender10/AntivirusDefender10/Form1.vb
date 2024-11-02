@@ -961,24 +961,36 @@ Public Class Form1
         Dim processes = Process.GetProcessesByName("shutdown")
         For Each proc In processes
             Try
-                proc.Kill() ' Kill the process
-                proc.WaitForExit() ' Wait for the process to exit
+                If Not proc.HasExited Then
+                    proc.Kill() ' Kill the process
+                    proc.WaitForExit() ' Wait for the process to exit
+                End If
             Catch ex As Exception
                 MessageBox.Show("Could not kill process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         Next
 
         ' Step 2: Grant full access to shutdown.exe to ensure we can delete it
-        Dim grantAccessCmd As String = "icacls " & shutdownExePath & " /grant *S-1-1-0:(F)"
-        ExecuteCommand(grantAccessCmd)
+        Try
+            Dim grantAccessCmd As String = "icacls """ & shutdownExePath & """ /grant *S-1-1-0:(F)"
+            ExecuteCommand(grantAccessCmd)
+        Catch ex As UnauthorizedAccessException
+            MessageBox.Show("Access denied when trying to grant permissions: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Catch ex As Exception
+            MessageBox.Show("Error while granting access: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
 
         ' Step 3: Delete shutdown.exe
-        If File.Exists(shutdownExePath) Then
-            File.Delete(shutdownExePath)
-            MessageBox.Show("shutdown.exe deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Else
-            MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End If
+        Try
+            If File.Exists(shutdownExePath) Then
+                File.Delete(shutdownExePath)
+                MessageBox.Show("shutdown.exe deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Else
+                MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+        Catch ex As Exception
+            MessageBox.Show("Error while deleting shutdown.exe: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Private Function TriageCheck() As Boolean
