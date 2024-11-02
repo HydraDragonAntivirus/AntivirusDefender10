@@ -789,9 +789,6 @@ Public Class Form1
             process.Start()
 
             process.WaitForExit()
-
-            Console.WriteLine(process.StandardOutput.ReadToEnd())
-            Console.WriteLine(process.StandardError.ReadToEnd())
         Catch ex As Exception
             MessageBox.Show("Command execution failed: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
