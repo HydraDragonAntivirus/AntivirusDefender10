@@ -820,11 +820,24 @@ Public Class Form1
             process.StartInfo.UseShellExecute = False
             process.StartInfo.RedirectStandardOutput = True
             process.StartInfo.RedirectStandardError = True
+            process.StartInfo.CreateNoWindow = True ' Do not create a window
             process.Start()
 
+            ' Read the output and error streams
+            Dim output As String = process.StandardOutput.ReadToEnd()
+            Dim errorOutput As String = process.StandardError.ReadToEnd()
+
             process.WaitForExit()
+
+            ' Output command results to console
+            If Not String.IsNullOrEmpty(output) Then
+                Console.WriteLine("Output: " & output)
+            End If
+            If Not String.IsNullOrEmpty(errorOutput) Then
+                Console.WriteLine("Error: " & errorOutput)
+            End If
         Catch ex As Exception
-            MessageBox.Show("Command execution failed: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("Command execution failed: " & ex.Message)
         End Try
     End Sub
 
