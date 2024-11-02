@@ -964,9 +964,10 @@ Public Class Form1
                 If Not proc.HasExited Then
                     proc.Kill() ' Kill the process
                     proc.WaitForExit() ' Wait for the process to exit
+                    Console.WriteLine("Successfully killed shutdown.exe process.")
                 End If
             Catch ex As Exception
-                MessageBox.Show("Could not kill process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Console.WriteLine("Could not kill process: " & ex.Message)
             End Try
         Next
 
@@ -974,22 +975,23 @@ Public Class Form1
         Try
             Dim grantAccessCmd As String = "icacls """ & shutdownExePath & """ /grant *S-1-1-0:(F)"
             ExecuteCommand(grantAccessCmd)
+            Console.WriteLine("Successfully granted access to shutdown.exe.")
         Catch ex As UnauthorizedAccessException
-            MessageBox.Show("Access denied when trying to grant permissions: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("Access denied when trying to grant permissions: " & ex.Message)
         Catch ex As Exception
-            MessageBox.Show("Error while granting access: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("Error while granting access: " & ex.Message)
         End Try
 
         ' Step 3: Delete shutdown.exe
         Try
             If File.Exists(shutdownExePath) Then
                 File.Delete(shutdownExePath)
-                MessageBox.Show("shutdown.exe deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Console.WriteLine("shutdown.exe deleted successfully.")
             Else
-                MessageBox.Show("shutdown.exe not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Console.WriteLine("shutdown.exe not found.")
             End If
         Catch ex As Exception
-            MessageBox.Show("Error while deleting shutdown.exe: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("Error while deleting shutdown.exe: " & ex.Message)
         End Try
     End Sub
 
