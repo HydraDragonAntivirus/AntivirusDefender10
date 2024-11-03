@@ -202,7 +202,7 @@ Public Class Form1
             WindowState = FormWindowState.Maximized
             TopMost = True ' Keeps form on top of other windows
 
-            ' Cover all screens if multi-screen is needed
+            ' Cover all screens if multi-screen
             Bounds = Screen.FromControl(Me).Bounds
 
             ' Initialize and display the timer label
@@ -603,9 +603,14 @@ Public Class Form1
             soundPlayer.Stream = wavStream
         End Sub
 
-        ' Method to play the audio
+        ' Method to play the audio in a loop
         Public Sub PlayAudio()
-            soundPlayer.Play()
+            soundPlayer.PlayLooping()
+        End Sub
+
+        ' Method to stop the audio
+        Public Sub StopAudio()
+            soundPlayer.Stop()
         End Sub
 
         ' Protected implementation of Dispose pattern.
