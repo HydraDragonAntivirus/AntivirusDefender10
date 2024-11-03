@@ -457,8 +457,8 @@ Public Class Form1
                 End Using
 
                 ' Save the image to file
-                Dim filePath As String = "C:\antivirusdefender.png"
-                portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
+                Dim filePath As String = Path.Combine(Path.GetTempPath(), "antivirusdefender.png")
+                portalImage.Save(filePath, Imaging.ImageFormat.Png)
 
                 ' Draw the image with the portal effect
                 For y As Integer = 0 To Height Step gridSize
