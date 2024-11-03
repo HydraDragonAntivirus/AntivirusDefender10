@@ -202,9 +202,6 @@ Public Class Form1
             WindowState = FormWindowState.Maximized
             TopMost = True ' Keeps form on top of other windows
 
-            ' Cover all screens if multi-screen
-            Bounds = Screen.FromControl(Me).Bounds
-
             ' Initialize and display the timer label
             timerLabel.AutoSize = True
             timerLabel.ForeColor = Color.White
@@ -503,11 +500,7 @@ Public Class Form1
             g.SmoothingMode = SmoothingMode.None
 
             ' Draw portal effect
-            If InvokeRequired Then
-                Invoke(Sub() overlay.ApplyPortalEffect(g))
-            Else
-                overlay.ApplyPortalEffect(g)
-            End If
+            overlay.ApplyPortalEffect(g)
 
             ' Update the countdown timer label
             If overlay.countdownTime > 0 Then
