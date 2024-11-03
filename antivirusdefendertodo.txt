@@ -10,3 +10,4 @@ Change keyboard things like noescape and spamming text on desktop moving files e
 Jigsaw ransomware like things
 UEFI system remover, mandela like grant access then remove file one by one
 At GDI effects change texts to gibberish text at windows title etc.
+Linux platform detector
