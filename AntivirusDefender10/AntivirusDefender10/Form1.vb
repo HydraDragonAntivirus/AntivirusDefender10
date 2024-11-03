@@ -440,7 +440,7 @@ Public Class Form1
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 80 ' Size of each pixelated "block"
+            Dim gridSize As Integer = 200 ' Size of each pixelated "block"
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
             Try
