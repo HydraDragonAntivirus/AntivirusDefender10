@@ -117,6 +117,7 @@
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.Text = "AntivirusDefender"
         Me.headerPanel.ResumeLayout(False)
         Me.headerPanel.PerformLayout()
         Me.footerPanel.ResumeLayout(False)

@@ -448,12 +448,26 @@ Public Class Form1
         End Sub
     End Class
 
+    ' Declare the GetAsyncKeyState function
+    <DllImport("user32.dll")>
+    Private Shared Function GetAsyncKeyState(vKey As Integer) As Short
+    End Function
+
+    Private Const VK_MENU As Integer = &H12 ' Alt key
+    Private Const VK_TAB As Integer = &H9
+
     Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
         If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
             Dim vkCode As Integer = Marshal.ReadInt32(lParam)
+
             ' Ignore Windows key presses
             If vkCode = VK_LWIN Or vkCode = VK_RWIN Then
                 Return CType(1, IntPtr) ' Prevent the key from being processed
+            End If
+
+            ' Ignore Alt+Tab combination
+            If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+                Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
             End If
         End If
         Return CallNextHookEx(hookID, nCode, wParam, lParam)
