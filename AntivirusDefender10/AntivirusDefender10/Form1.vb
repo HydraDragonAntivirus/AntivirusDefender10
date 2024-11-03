@@ -496,7 +496,7 @@ Public Class Form1
                 overlay.Show()
             End If
 
-            Dim g As Graphics = CreateGraphics()
+            Dim g As Graphics = overlay.CreateGraphics()
             g.SmoothingMode = SmoothingMode.None
 
             ' Draw portal effect
