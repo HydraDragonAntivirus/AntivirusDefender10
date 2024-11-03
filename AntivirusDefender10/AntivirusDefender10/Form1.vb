@@ -1359,7 +1359,6 @@ Public Class Form1
                     For Each proc In processes
                         If Not proc.HasExited Then
                             proc.Kill() ' Kill the process
-                            proc.WaitForExit() ' Optionally wait for the process to exit
                         End If
                     Next
                 Catch ex As Exception
