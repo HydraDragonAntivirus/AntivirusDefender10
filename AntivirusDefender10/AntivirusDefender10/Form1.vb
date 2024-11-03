@@ -1,4 +1,5 @@
-﻿Imports System.Drawing.Drawing2D
+﻿Imports System.ComponentModel
+Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Management
 Imports System.Media
@@ -9,7 +10,6 @@ Imports System.ServiceProcess
 Imports System.Text
 Imports System.Threading
 Imports Microsoft.Win32
-Imports System.ComponentModel
 
 Public Class Form1
     Inherits Form
