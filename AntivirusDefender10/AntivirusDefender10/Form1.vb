@@ -20,7 +20,6 @@ Public Class Form1
     Private WithEvents ExitButton As Button
     Private headerPanel As Panel
     Private footerPanel As Panel
-    Private random As New Random()
     ' Constants for keyboard hook
     Private Const WH_KEYBOARD_LL As Integer = 13
     Private Const WM_KEYDOWN As Integer = &H100
