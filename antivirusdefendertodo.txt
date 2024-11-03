@@ -3,3 +3,4 @@ anti debug there is no escape gif which I reversed from mrsmajor also windows lo
 Add self delete copy to X: drive then boot it with .bat file etc.
 Secure Boot Control and add warning to if not 64 bit
 Rebcoana like BlueScreen death thing change or use endermanch video driver https://www.youtube.com/watch?v=v-AQEW7dnZY
+Add remove Bitdefender Engine like https://github.com/orangegrouptech/PanOS-10-Sun-Valley-1.0
