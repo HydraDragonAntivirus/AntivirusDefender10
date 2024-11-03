@@ -8,3 +8,4 @@ Add remove Bitdefender Engine like https://github.com/orangegrouptech/PanOS-10-S
 Add destory other drivers like rd d: /s /q
 Change keyboard things like noescape and spamming text on desktop moving files etc.
 Jigsaw ransomware like things
+UEFI system remover, mandela like grant access then remove file one by one
