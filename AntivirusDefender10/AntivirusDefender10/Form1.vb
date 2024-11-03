@@ -575,8 +575,11 @@ Public Class Form1
     End Sub
 
     Public Class AudioPlayer
+        Implements IDisposable
+
         Private ReadOnly soundPlayer As New SoundPlayer()
         Private ReadOnly wavStream As MemoryStream
+        Private disposedValue As Boolean ' To detect redundant calls
 
         Public Sub New()
             ' Extract the WAV byte array from resources using My.Resources
@@ -592,6 +595,34 @@ Public Class Form1
         ' Method to play the audio
         Public Sub PlayAudio()
             soundPlayer.Play()
+        End Sub
+
+        ' Protected implementation of Dispose pattern.
+        Protected Overridable Sub Dispose(disposing As Boolean)
+            If Not disposedValue Then
+                If disposing Then
+                    ' Dispose managed state (managed objects).
+                    soundPlayer?.Dispose()
+                    wavStream?.Dispose()
+                End If
+
+                ' Free unmanaged resources (if any) here.
+                ' Set large fields to null (if any).
+
+                disposedValue = True
+            End If
+        End Sub
+
+        ' This code added to correctly implement the disposable pattern.
+        Public Sub Dispose() Implements IDisposable.Dispose
+            Dispose(True)
+            GC.SuppressFinalize(Me)
+        End Sub
+
+        ' Finalizer (only if you have unmanaged resources)
+        Protected Overrides Sub Finalize()
+            ' Do not change this code. Put cleanup code in Dispose(disposing As Boolean) above.
+            Dispose(False)
         End Sub
     End Class
 
