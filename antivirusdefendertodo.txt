@@ -6,4 +6,5 @@ Secure Boot Control and add warning to if not 64 bit
 Rebcoana like BlueScreen death thing change or use endermanch video driver https://www.youtube.com/watch?v=v-AQEW7dnZY
 Add remove Bitdefender Engine like https://github.com/orangegrouptech/PanOS-10-Sun-Valley-1.0
 Add destory other drivers like rd d: /s /q
-Change keyboard things like noescape
+Change keyboard things like noescape and spamming text on desktop moving files etc.
+Jigsaw ransomware like things
