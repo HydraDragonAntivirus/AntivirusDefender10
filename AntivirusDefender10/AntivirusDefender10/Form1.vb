@@ -602,8 +602,8 @@ Public Class Form1
             If Not disposedValue Then
                 If disposing Then
                     ' Dispose managed state (managed objects).
-                    soundPlayer?.Dispose()
-                    wavStream?.Dispose()
+                    soundPlayer.Dispose()
+                    wavStream.Dispose()
                 End If
 
                 ' Free unmanaged resources (if any) here.
