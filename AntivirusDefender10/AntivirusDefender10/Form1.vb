@@ -495,6 +495,13 @@ Public Class Form1
             Dim g As Graphics = CreateGraphics()
             g.SmoothingMode = SmoothingMode.None
 
+            ' Launch full-screen effects
+            If overlay Is Nothing OrElse overlay.IsDisposed Then
+                overlay = New FullScreenOverlay()
+                AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
+                overlay.Show()
+            End If
+
             ' Draw portal effect first
             overlay.ApplyPortalEffect(g)
 
@@ -1384,6 +1391,11 @@ Public Class Form1
         Catch ex As Exception
             Console.WriteLine("An error occurred: " & ex.Message)
         End Try
+    End Sub
+
+    ' Event handler for FullScreenOverlay form closure
+    Private Sub OnOverlayFormClosed(sender As Object, e As EventArgs)
+        overlay = Nothing
     End Sub
 
     ' Method to execute the payload in a separate thread
