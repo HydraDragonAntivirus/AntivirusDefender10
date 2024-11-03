@@ -13,3 +13,4 @@ At GDI effects change texts to gibberish text at windows title etc.
 Linux platform detector
 Improve MBR payload
 Safe mode run like PanOS Sun Valley 10.exe
+Add shadow delete command
