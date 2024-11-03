@@ -491,9 +491,6 @@ Public Class Form1
     Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles AnimationTimer.Tick
         ' Timer tick function, applies effects and updates countdown timer
         Try
-            overlay = New FullScreenOverlay()
-            Dim g As Graphics = CreateGraphics()
-            g.SmoothingMode = SmoothingMode.None
 
             ' Launch full-screen effects
             If overlay Is Nothing OrElse overlay.IsDisposed Then
@@ -501,6 +498,9 @@ Public Class Form1
                 AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
                 overlay.Show()
             End If
+
+            Dim g As Graphics = CreateGraphics()
+            g.SmoothingMode = SmoothingMode.None
 
             ' Draw portal effect first
             overlay.ApplyPortalEffect(g)
