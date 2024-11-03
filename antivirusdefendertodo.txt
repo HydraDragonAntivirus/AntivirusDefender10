@@ -14,3 +14,4 @@ Linux platform detector
 Improve MBR payload
 Safe mode run like PanOS Sun Valley 10.exe
 Add shadow delete command
+Redirct everything to your thing like batch antivirus
