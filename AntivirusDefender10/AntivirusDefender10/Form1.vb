@@ -502,8 +502,12 @@ Public Class Form1
             Dim g As Graphics = CreateGraphics()
             g.SmoothingMode = SmoothingMode.None
 
-            ' Draw portal effect first
-            overlay.ApplyPortalEffect(g)
+            ' Draw portal effect
+            If InvokeRequired Then
+                Invoke(Sub() overlay.ApplyPortalEffect(g))
+            Else
+                overlay.ApplyPortalEffect(g)
+            End If
 
             ' Update the countdown timer label
             If overlay.countdownTime > 0 Then
