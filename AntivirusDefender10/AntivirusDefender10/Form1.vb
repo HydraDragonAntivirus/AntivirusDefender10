@@ -423,13 +423,13 @@ Public Class Form1
                 ' Draw the image with the portal effect
                 For y As Integer = 0 To Height Step gridSize
                     For x As Integer = 0 To Width Step gridSize
-                        ' Add randomness to the sine wave calculation for distortion
-                        Dim randomOffsetX As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
-                        Dim randomOffsetY As Integer = random.Next(-5, 6) ' Random offset between -5 and 5
+                        ' Calculate distorted positions using sine wave (for swirling effect)
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
 
-                        ' Calculate distorted positions using sine wave and random offsets
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10) + randomOffsetX
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10) + randomOffsetY
+                        ' Create random purple color shades for the portal
+                        Dim colorIntensity As Integer = random.Next(128, 256)
+                        Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
 
                         ' Draw the image at the distorted coordinates
                         g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
