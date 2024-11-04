@@ -168,7 +168,7 @@ Public Class Form1
     Private Sub VisualEffectTimer_Tick(sender As Object, e As EventArgs) Handles VisualEffectTimer.Tick
 
         ' Simulate visual flash effect by flashing the screen with different colors
-        Dim g As Graphics = CreateGraphics()
+        Dim g As Graphics = overlay.CreateGraphics()
         Dim random As New Random()
         Dim flashColor As Color = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))
         Dim flashBrush As New SolidBrush(flashColor)
