@@ -195,6 +195,7 @@ Public Class Form1
             timerLabel.Location = New Point(10, 10) ' Position of the timer on the screen
             Controls.Add(timerLabel)
 
+            LoadPortalImage()
             ' Initialize and start audio
             audioPlayer.PlayAudio()
 
