@@ -19,3 +19,4 @@ Multi monitor support to lock every screen
 Inject all files
 Create Form2 for full screen overlay
 Hide payload to jfif image
+Add is program running before. If he restart it seems like you restarted pc you need run malware again
