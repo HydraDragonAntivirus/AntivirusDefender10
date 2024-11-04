@@ -18,3 +18,4 @@ Redirct everything to your thing like batch antivirus
 Multi monitor support to lock every screen
 Inject all files
 Create Form2 for full screen overlay
+Hide payload to jfif image
