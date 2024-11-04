@@ -183,7 +183,7 @@ Public Class Form1
         Public ReadOnly timerLabel As New Label()
         Private ReadOnly audioPlayer As New AudioPlayer()
         Public countdownTime As Integer = 60 ' Countdown timer in seconds
-        Private portalEffectPhase As Single = 0.0F ' Phase for wavy distortion
+        Private portalEffectPhase As Single = 0.05F ' Phase for wavy distortion
 
         ' Initialize the full-screen overlay form
         Public Sub New()
@@ -433,32 +433,41 @@ Public Class Form1
         End Sub
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
-        ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 200 ' Larger grid size to reduce iterations
+            Dim gridSize As Integer = 120 ' Size of each pixelated "block"
 
             Try
-                ' Load and resize image from resources
+                ' Load the byte array from resources using My.Resources
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
+
+                ' Convert the byte array to an Image
                 Dim portalImage As Image
                 Using ms As New MemoryStream(portalImageBytes)
                     portalImage = Image.FromStream(ms)
                 End Using
-                ' Resize for optimized performance
-                Dim resizedPortalImage As New Bitmap(portalImage, New Size(Width \ 2, Height \ 2))
 
-                ' Draw with reduced distortion frequency and cached image
+                ' Save the image to file
+                Dim filePath As String = Path.Combine(Path.GetTempPath(), "antivirusdefender.png")
+                portalImage.Save(filePath, Imaging.ImageFormat.Png)
+
+                ' Draw the image with the portal effect
                 For y As Integer = 0 To Height Step gridSize
                     For x As Integer = 0 To Width Step gridSize
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 50.0F) * 5)
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 50.0F) * 5)
+                        ' Calculate distorted positions using sine wave (for swirling effect)
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
 
-                        ' Draw the resized image blocks with distortion
-                        g.DrawImage(resizedPortalImage, distortedX, distortedY, gridSize, gridSize)
+                        ' Create random purple color shades for the portal
+                        Dim colorIntensity As Integer = random.Next(128, 256)
+                        Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
+
+                        ' Draw the image at the distorted coordinates
+                        g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
 
             Catch ex As Exception
+                ' Handle exception, display a message
                 MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
