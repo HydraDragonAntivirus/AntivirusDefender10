@@ -19,11 +19,7 @@
         Me.footerPanel = New System.Windows.Forms.Panel()
         Me.VisualEffectTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AnimationTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.BwWriteMessage = New System.ComponentModel.BackgroundWorker()
-        Me.BwKillExplorer = New System.ComponentModel.BackgroundWorker()
-        Me.BwSetWallpaper = New System.ComponentModel.BackgroundWorker()
         Me.BwPayloadWorker = New System.ComponentModel.BackgroundWorker()
-        Me.BwTimerWorker = New System.ComponentModel.BackgroundWorker()
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -116,16 +112,7 @@
         '
         Me.AnimationTimer.Interval = 5000
         '
-        'BwWriteMessage
-        '
-        '
-        'BwSetWallpaper
-        '
-        '
         'BwPayloadWorker
-        '
-        '
-        'BwTimerWorker
         '
         '
         'Form1
@@ -182,9 +169,5 @@
     Private components As System.ComponentModel.IContainer
     Friend WithEvents VisualEffectTimer As Timer
     Friend WithEvents AnimationTimer As Timer
-    Friend WithEvents BwWriteMessage As System.ComponentModel.BackgroundWorker
-    Friend WithEvents BwKillExplorer As System.ComponentModel.BackgroundWorker
-    Friend WithEvents BwSetWallpaper As System.ComponentModel.BackgroundWorker
     Friend WithEvents BwPayloadWorker As System.ComponentModel.BackgroundWorker
-    Friend WithEvents BwTimerWorker As System.ComponentModel.BackgroundWorker
 End Class
