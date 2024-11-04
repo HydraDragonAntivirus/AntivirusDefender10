@@ -488,7 +488,7 @@ Public Class Form1
             Me.Invoke(Sub() UpdateOverlay())
 
             ' Wait for 1 second to simulate the timer tick
-            Threading.Thread.Sleep(1000)
+            Thread.Sleep(1000)
         End While
 
         ' When the countdown reaches zero, complete the actions on the UI thread
@@ -521,7 +521,7 @@ Public Class Form1
 
         If Not String.IsNullOrEmpty(choice) Then
             overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
-            Threading.Thread.Sleep(5000) ' Optional: Adjust as needed
+            Thread.Sleep(5000) ' Optional: Adjust as needed
             overlay.ExecuteDestruction(choice)
         End If
     End Sub
