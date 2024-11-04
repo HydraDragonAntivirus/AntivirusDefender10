@@ -74,6 +74,10 @@ Public Class Form1
     Private Shared Function CallNextHookEx(hhk As IntPtr, nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
     End Function
 
+    <DllImport("kernel32")>
+    Private Shared Function CloseHandle(hObject As IntPtr) As Boolean
+    End Function
+
     Public Class CriticalProcess
 
         ' Imports for DLL functions
@@ -95,10 +99,6 @@ Public Class Form1
 
         <DllImport("kernel32.dll", SetLastError:=True)>
         Private Shared Function OpenProcessToken(ProcessHandle As IntPtr, DesiredAccess As UInt32, ByRef TokenHandle As IntPtr) As Boolean
-        End Function
-
-        <DllImport("kernel32.dll", SetLastError:=True)>
-        Private Shared Function CloseHandle(hObject As IntPtr) As Boolean
         End Function
 
         ' Structures
@@ -793,10 +793,6 @@ Public Class Form1
         nNumberOfBytesToWrite As UInteger,
         ByRef lpNumberOfBytesWritten As UInteger,
         lpOverlapped As IntPtr) As Boolean
-    End Function
-
-    <DllImport("kernel32")>
-    Private Shared Function CloseHandle(hObject As IntPtr) As Boolean
     End Function
 
     ' Constants
