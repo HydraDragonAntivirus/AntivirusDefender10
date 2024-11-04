@@ -14,13 +14,6 @@ Imports Microsoft.Win32
 Public Class Form1
     Inherits Form
 
-    Private titleLabel As Label
-    Private instructionLabel As Label
-    Private inputTextBox As TextBox
-    Private WithEvents ActivateButton As Button
-    Private WithEvents ExitButton As Button
-    Private headerPanel As Panel
-    Private footerPanel As Panel
     ' Constants for keyboard hook
     Private Const WH_KEYBOARD_LL As Integer = 13
     Private Const WM_KEYDOWN As Integer = &H100
