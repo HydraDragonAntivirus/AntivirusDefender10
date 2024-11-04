@@ -424,7 +424,7 @@ Public Class Form1
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 200 ' Larger grid size reduces the load
+            Dim gridSize As Integer = 100 ' Smaller grid size reduces the load ironically
 
             Try
                 ' Load the byte array from resources using My.Resources
