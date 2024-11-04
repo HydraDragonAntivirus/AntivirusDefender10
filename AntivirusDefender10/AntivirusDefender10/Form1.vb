@@ -194,8 +194,6 @@ Public Class Form1
             timerLabel.Font = New Font("Segoe UI", 20, FontStyle.Bold)
             timerLabel.Location = New Point(10, 10) ' Position of the timer on the screen
             Controls.Add(timerLabel)
-
-            LoadPortalImage()
             ' Initialize and start audio
             audioPlayer.PlayAudio()
 
@@ -427,7 +425,7 @@ Public Class Form1
 
 
         ' Load the image once during initialization
-        Private Sub LoadPortalImage()
+        Public Sub LoadPortalImage()
             Try
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
                 Using ms As New MemoryStream(portalImageBytes)
@@ -487,6 +485,8 @@ Public Class Form1
             AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
             overlay.Show()
         End If
+
+        overlay.LoadPortalImage()
 
         ' Set up and start the countdown thread
         countdownThread = New Thread(AddressOf CountdownLoop)
