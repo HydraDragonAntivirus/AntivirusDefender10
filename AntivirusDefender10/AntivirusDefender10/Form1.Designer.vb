@@ -19,7 +19,6 @@
         Me.footerPanel = New System.Windows.Forms.Panel()
         Me.VisualEffectTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AnimationTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.BwPayloadWorker = New System.ComponentModel.BackgroundWorker()
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -112,9 +111,6 @@
         '
         Me.AnimationTimer.Interval = 5000
         '
-        'BwPayloadWorker
-        '
-        '
         'Form1
         '
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer))
@@ -169,5 +165,4 @@
     Private components As System.ComponentModel.IContainer
     Friend WithEvents VisualEffectTimer As Timer
     Friend WithEvents AnimationTimer As Timer
-    Friend WithEvents BwPayloadWorker As System.ComponentModel.BackgroundWorker
 End Class

