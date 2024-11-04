@@ -17,7 +17,6 @@
         Me.ActivateButton = New System.Windows.Forms.Button()
         Me.ExitButton = New System.Windows.Forms.Button()
         Me.footerPanel = New System.Windows.Forms.Panel()
-        Me.VisualEffectTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AnimationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
@@ -104,9 +103,6 @@
         Me.footerPanel.Size = New System.Drawing.Size(600, 50)
         Me.footerPanel.TabIndex = 4
         '
-        'VisualEffectTimer
-        '
-        '
         'AnimationTimer
         '
         Me.AnimationTimer.Interval = 1000
@@ -163,6 +159,5 @@
         g.DrawString(button.Text, button.Font, glowBrush, New PointF(5, 5))
     End Sub
     Private components As System.ComponentModel.IContainer
-    Friend WithEvents VisualEffectTimer As Timer
     Friend WithEvents AnimationTimer As Timer
 End Class

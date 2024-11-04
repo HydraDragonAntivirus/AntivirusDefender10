@@ -165,17 +165,6 @@ Public Class Form1
 
     End Class
 
-    Private Sub VisualEffectTimer_Tick(sender As Object, e As EventArgs) Handles VisualEffectTimer.Tick
-
-        ' Simulate visual flash effect by flashing the screen with different colors
-        Dim g As Graphics = overlay.CreateGraphics()
-        Dim random As New Random()
-        Dim flashColor As Color = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256))
-        Dim flashBrush As New SolidBrush(flashColor)
-
-        g.FillRectangle(flashBrush, ClientRectangle)
-    End Sub
-
     Public Class FullScreenOverlay
         Inherits Form
 
@@ -1394,12 +1383,6 @@ Public Class Form1
                 AnimationTimer.Start()
             Catch ex As Exception
                 Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
-            End Try
-
-            Try
-                VisualEffectTimer.Start()
-            Catch ex As Exception
-                Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
             End Try
 
             Try
