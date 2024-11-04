@@ -434,41 +434,33 @@ Public Class Form1
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 120 ' Size of each pixelated "block"
-            portalEffectPhase += 0.05F ' Increment phase for wavy distortion
+            Dim gridSize As Integer = 200 ' Larger grid size reduces the load
+
+            ' Enable double buffering
+            DoubleBuffered = True
 
             Try
                 ' Load the byte array from resources using My.Resources
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
-
-                ' Convert the byte array to an Image
                 Dim portalImage As Image
+
                 Using ms As New MemoryStream(portalImageBytes)
                     portalImage = Image.FromStream(ms)
                 End Using
 
-                ' Save the image to file
-                Dim filePath As String = Path.Combine(Path.GetTempPath(), "antivirusdefender.png")
-                portalImage.Save(filePath, Imaging.ImageFormat.Png)
-
-                ' Draw the image with the portal effect
+                ' Draw with optimized loop
                 For y As Integer = 0 To Height Step gridSize
                     For x As Integer = 0 To Width Step gridSize
-                        ' Calculate distorted positions using sine wave (for swirling effect)
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
+                        ' Apply reduced distortion for performance
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 40.0F) * 5)
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 40.0F) * 5)
 
-                        ' Create random purple color shades for the portal
-                        Dim colorIntensity As Integer = random.Next(128, 256)
-                        Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
-
-                        ' Draw the image at the distorted coordinates
+                        ' Draw image blocks with calculated distortion
                         g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
 
             Catch ex As Exception
-                ' Handle exception, display a message
                 MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
@@ -999,7 +991,7 @@ Public Class Form1
 
             ' Set the wallpaper
             If Not SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, wallpaperTempPath, SPIF_UPDATEINIFILE Or SPIF_SENDCHANGE) Then
-                MessageBox.Show("Error: Unable to set wallpaper.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Console.WriteLine("Error: Unable to set wallpaper.")
                 Return
             End If
 
