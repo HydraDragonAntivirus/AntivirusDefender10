@@ -23,6 +23,8 @@ Public Class Form1
     Private hookID As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
     Private countdownThread As Thread
+    ' Define portal image at the class level to preload it once
+    Public portalImage As Image
 
     ' Delegate for hook callback
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
@@ -422,33 +424,44 @@ Public Class Form1
             Next
         End Sub
 
+
+        ' Load the image once during initialization
+        Private Sub LoadPortalImage()
+            Try
+                Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
+                Using ms As New MemoryStream(portalImageBytes)
+                    Form1.portalImage = Image.FromStream(ms)
+                End Using
+            Catch ex As Exception
+                MessageBox.Show("Failed to load portal image: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End Sub
+
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 100 ' Smaller grid size reduces the load ironically
+            Dim gridSize As Integer = 100 ' Adjust the grid size to balance load and visual effect
+
+            ' Verify graphics context and loaded image
+            If g Is Nothing OrElse Form1.portalImage Is Nothing Then
+                MessageBox.Show("Graphics context or portal image is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return
+            End If
 
             Try
-                ' Load the byte array from resources using My.Resources
-                Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
-                Dim portalImage As Image
-
-                Using ms As New MemoryStream(portalImageBytes)
-                    portalImage = Image.FromStream(ms)
-                End Using
-
                 ' Draw with optimized loop
-                For y As Integer = 0 To Height Step gridSize
-                    For x As Integer = 0 To Width Step gridSize
-                        ' Apply reduced distortion for performance
+                For y As Integer = 0 To Form1.overlay.Height Step gridSize
+                    For x As Integer = 0 To Form1.overlay.Width Step gridSize
+                        ' Apply distortion effect
                         Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 40.0F) * 5)
                         Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 40.0F) * 5)
 
                         ' Draw image blocks with calculated distortion
-                        g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
+                        g.DrawImage(Form1.portalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
 
             Catch ex As Exception
-                MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show("An error occurred during portal effect rendering: " & ex.Message, "Rendering Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
 
