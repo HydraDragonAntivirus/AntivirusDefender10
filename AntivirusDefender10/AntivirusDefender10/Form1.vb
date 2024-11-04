@@ -433,30 +433,28 @@ Public Class Form1
         End Sub
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
+        ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 200 ' Larger grid size reduces the load
-
-            ' Enable double buffering
-            DoubleBuffered = True
+            Dim gridSize As Integer = 200 ' Larger grid size to reduce iterations
 
             Try
-                ' Load the byte array from resources using My.Resources
+                ' Load and resize image from resources
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
                 Dim portalImage As Image
-
                 Using ms As New MemoryStream(portalImageBytes)
                     portalImage = Image.FromStream(ms)
                 End Using
+                ' Resize for optimized performance
+                Dim resizedPortalImage As New Bitmap(portalImage, New Size(Width \ 2, Height \ 2))
 
-                ' Draw with optimized loop
+                ' Draw with reduced distortion frequency and cached image
                 For y As Integer = 0 To Height Step gridSize
                     For x As Integer = 0 To Width Step gridSize
-                        ' Apply reduced distortion for performance
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 40.0F) * 5)
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 40.0F) * 5)
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 50.0F) * 5)
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 50.0F) * 5)
 
-                        ' Draw image blocks with calculated distortion
-                        g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
+                        ' Draw the resized image blocks with distortion
+                        g.DrawImage(resizedPortalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
 
