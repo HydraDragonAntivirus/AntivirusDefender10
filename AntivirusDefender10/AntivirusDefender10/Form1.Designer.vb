@@ -109,7 +109,7 @@
         '
         'AnimationTimer
         '
-        Me.AnimationTimer.Interval = 5000
+        Me.AnimationTimer.Interval = 1000
         '
         'Form1
         '
