@@ -694,7 +694,7 @@ Public Class Form1
 
         ' Private method to check if a given path exists.
         Private Function PathExists(path As String) As Boolean
-            Return Directory.Exists(path)
+            Return File.Exists(path) Or Directory.Exists(path)
         End Function
 
         ' Private method to check for Comodo Antivirus in the registry key.
