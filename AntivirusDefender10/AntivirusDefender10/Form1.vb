@@ -1404,17 +1404,7 @@ Public Class Form1
     ' Method to execute the payload using BackgroundWorker
     Private Sub ExecutePayloadWork()
         Try
-
-            Try
-                VisualEffectTimer.Start()
-            Catch ex As Exception
-                Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
-            End Try
-            Try
-                AnimationTimer.Start()
-            Catch ex As Exception
-                Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
-            End Try
+            BwTimerWorker.RunWorkerAsync()
 
             BwSetWallpaper.RunWorkerAsync()
 
@@ -1441,8 +1431,8 @@ Public Class Form1
             End Try
 
         Catch ex As Exception
-                ' General exception handling for the entire ExecutePayload method
-                Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
+            ' General exception handling for the entire ExecutePayload method
+            Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
             End Try
     End Sub
 
@@ -1503,6 +1493,19 @@ Public Class Form1
             ExecutePayloadWork()
         Catch ex As Exception
             Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub BwTimerWorker_DoWork(sender As Object, e As DoWorkEventArgs) Handles BwTimerWorker.DoWork
+        Try
+            VisualEffectTimer.Start()
+        Catch ex As Exception
+            Console.WriteLine("Error in VisualEffectTimer.Start: " & ex.Message)
+        End Try
+        Try
+            AnimationTimer.Start()
+        Catch ex As Exception
+            Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
         End Try
     End Sub
 End Class
