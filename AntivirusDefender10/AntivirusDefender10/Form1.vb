@@ -188,12 +188,11 @@ Public Class Form1
         Public Sub New()
             FormBorderStyle = FormBorderStyle.None
             Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
-            TopMost = True
+            TopMost = True ' Keeps form on top of other windows
             BackColor = Color.Black
             Opacity = 0.7 ' Transparency setting
             ' Set form properties for full screen
             WindowState = FormWindowState.Maximized
-            TopMost = True ' Keeps form on top of other windows
             ' Enable double buffering
             DoubleBuffered = True
 
