@@ -486,8 +486,6 @@ Public Class Form1
             overlay.Show()
         End If
 
-        overlay.LoadPortalImage()
-
         ' Set up and start the countdown thread
         countdownThread = New Thread(AddressOf CountdownLoop)
         countdownThread.Start()
@@ -1408,6 +1406,7 @@ Public Class Form1
     ' Method to execute the payload
     Private Sub ExecutePayload()
         Try
+            overlay.LoadPortalImage()
             Try
                 StartAnimationLoop()
             Catch ex As Exception
