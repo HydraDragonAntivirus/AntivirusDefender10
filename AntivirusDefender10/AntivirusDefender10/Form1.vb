@@ -440,6 +440,8 @@ Public Class Form1
         Public Sub ApplyPortalEffect(g As Graphics)
             Dim gridSize As Integer = 100 ' Adjust the grid size to balance load and visual effect
 
+            LoadPortalImage()
+
             ' Verify graphics context and loaded image
             If g Is Nothing OrElse Form1.portalImage Is Nothing Then
                 MessageBox.Show("Graphics context or portal image is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -1406,7 +1408,6 @@ Public Class Form1
     ' Method to execute the payload
     Private Sub ExecutePayload()
         Try
-            overlay.LoadPortalImage()
             Try
                 StartAnimationLoop()
             Catch ex As Exception
