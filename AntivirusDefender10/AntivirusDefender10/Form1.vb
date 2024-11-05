@@ -466,19 +466,6 @@ Public Class Form1
             End Try
         End Sub
 
-        ' Disable Alt + F4
-        Protected Overrides Sub WndProc(ByRef m As Message)
-            Const WM_SYSCOMMAND As Integer = &H112
-            Const SC_CLOSE As Integer = &HF060
-
-            If m.Msg = WM_SYSCOMMAND AndAlso m.WParam.ToInt32() = SC_CLOSE Then
-                ' Ignore Alt + F4
-                Return
-            End If
-
-            MyBase.WndProc(m)
-        End Sub
-
         ' Prevent form from closing
         Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)
             e.Cancel = True
@@ -492,6 +479,7 @@ Public Class Form1
 
     Private Const VK_MENU As Integer = &H12 ' Alt key
     Private Const VK_TAB As Integer = &H9
+    Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
 
     Private Sub StartAnimationLoop()
         ' Initialize and display the overlay if it doesn't already exist
@@ -577,6 +565,11 @@ Public Class Form1
             ' Ignore Alt+Tab combination
             If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
                 Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
+            End If
+
+            ' Prevent Alt + F4
+            If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+                Return CType(1, IntPtr) ' Prevent Alt + F4
             End If
 
             ' Use the ThreadPool to run long-running tasks asynchronously
