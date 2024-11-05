@@ -578,13 +578,32 @@ Public Class Form1
             If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
                 Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
             End If
+
+            ' Use the ThreadPool to run long-running tasks asynchronously
+            ThreadPool.QueueUserWorkItem(Sub()
+                                             ' Perform any long-running operation here if needed
+                                         End Sub)
         End If
+
         Return CallNextHookEx(hookID, nCode, wParam, lParam)
     End Function
 
     ' Prevent form from closing
     Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)
         e.Cancel = True
+    End Sub
+
+    ' Override WndProc to disable Alt + F4
+    Protected Overrides Sub WndProc(ByRef m As Message)
+        Const WM_SYSCOMMAND As Integer = &H112
+        Const SC_CLOSE As Integer = &HF060
+
+        If m.Msg = WM_SYSCOMMAND AndAlso m.WParam.ToInt32() = SC_CLOSE Then
+            ' Ignore Alt + F4
+            Return
+        End If
+
+        MyBase.WndProc(m)
     End Sub
 
     ' Override ProcessCmdKey to handle specific keys
