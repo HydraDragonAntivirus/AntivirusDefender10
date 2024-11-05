@@ -490,37 +490,7 @@ Public Class Form1
         End If
 
         ' Set up and start the countdown thread
-        countdownThread = New Thread(AddressOf CountdownLoop)
-        countdownThread.Start()
-    End Sub
-
-    Private Sub CountdownLoop()
-        While overlay.countdownTime > 0
-            overlay.countdownTime -= 1
-
-            Try
-                If InvokeRequired Then
-                    BeginInvoke(New Action(Sub() UpdateOverlay()))
-                Else
-                    UpdateOverlay()
-                End If
-            Catch ex As Exception
-                MessageBox.Show("Error in UpdateOverlay: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Exit Sub
-            End Try
-
-            Thread.Sleep(1000)
-        End While
-
-        Try
-            If InvokeRequired Then
-                BeginInvoke(New Action(Sub() OnCountdownComplete()))
-            Else
-                OnCountdownComplete()
-            End If
-        Catch ex As Exception
-            MessageBox.Show("Error in OnCountdownComplete: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
+        countdownTimer.Start()
     End Sub
 
     Private Sub UpdateOverlay()
@@ -1497,4 +1467,17 @@ Public Class Form1
         End Try
     End Sub
 
+    Private Sub CountDownTimer_Tick(sender As Object, e As EventArgs) Handles CountDownTimer.Tick
+        ' Decrement the countdown time.
+        If overlay.countdownTime > 0 Then
+            overlay.countdownTime -= 1
+
+            ' Update the overlay directly on the UI thread.
+            UpdateOverlay()
+        Else
+            ' Stop the timer when the countdown reaches zero and handle completion.
+            CountDownTimer.Stop()
+            OnCountdownComplete()
+        End If
+    End Sub
 End Class
