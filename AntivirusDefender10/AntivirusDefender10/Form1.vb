@@ -594,7 +594,20 @@ Public Class Form1
             Return
         End If
 
-        MyBase.WndProc(m)
+        Try
+            MyBase.WndProc(m)
+        Catch ex As Exception
+            ' Check for inner exceptions
+            Dim innerEx As Exception = ex.InnerException
+            Dim errorMessage As String = "An error occurred: " & ex.Message
+
+            While innerEx IsNot Nothing
+                errorMessage &= vbCrLf & "Inner Exception: " & innerEx.Message
+                innerEx = innerEx.InnerException
+            End While
+
+            MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Public Class AudioPlayer
