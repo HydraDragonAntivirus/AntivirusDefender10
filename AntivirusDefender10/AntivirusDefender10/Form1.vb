@@ -514,7 +514,7 @@ Public Class Form1
             End If
 
         Catch ex As Exception
-            MessageBox.Show("An error occurred: " & ex.InnerException?.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("An error occurred: " & ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
