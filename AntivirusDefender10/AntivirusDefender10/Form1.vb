@@ -168,6 +168,11 @@ Public Class Form1
 
     End Class
 
+    Private Sub InitializeOverlay()
+        overlay = New FullScreenOverlay()
+        overlay.Show() ' Make sure the overlay is displayed
+    End Sub
+
     Public Class FullScreenOverlay
         Inherits Form
 
@@ -178,6 +183,7 @@ Public Class Form1
 
         ' Initialize the full-screen overlay form
         Public Sub New()
+            Form1.InitializeOverlay()
             FormBorderStyle = FormBorderStyle.None
             Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
             TopMost = True ' Keeps form on top of other windows
