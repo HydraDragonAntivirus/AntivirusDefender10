@@ -594,26 +594,7 @@ Public Class Form1
             Return
         End If
 
-        If InvokeRequired Then
-            ' Create a local copy of m
-            Dim messageCopy As Message = m
-            BeginInvoke(New Action(Sub() WndProc(messageCopy)))
-        Else
-            Try
-                MyBase.WndProc(m)
-            Catch ex As Exception
-                ' Check for inner exceptions
-                Dim innerEx As Exception = ex.InnerException
-                Dim errorMessage As String = "An error occurred: " & ex.Message
-
-                While innerEx IsNot Nothing
-                    errorMessage &= vbCrLf & "Inner Exception: " & innerEx.Message
-                    innerEx = innerEx.InnerException
-                End While
-
-                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-        End If
+        MyBase.WndProc(m)
     End Sub
 
     Public Class AudioPlayer
