@@ -440,11 +440,22 @@ Public Class Form1
         Public Sub ApplyPortalEffect(g As Graphics)
             Dim gridSize As Integer = 100 ' Adjust the grid size to balance load and visual effect
 
+            ' Load the portal image before rendering the effect
             LoadPortalImage()
 
-            ' Verify graphics context and loaded image
-            If g Is Nothing OrElse Form1.portalImage Is Nothing Then
-                MessageBox.Show("Graphics context or portal image is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            ' Check if graphics context and portal image are available
+            If g Is Nothing Then
+                MessageBox.Show("Graphics context is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return
+            End If
+
+            If Form1.overlay Is Nothing Then
+                MessageBox.Show("Overlay is not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Return
+            End If
+
+            If Form1.portalImage Is Nothing Then
+                MessageBox.Show("Portal image is not loaded.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Return
             End If
 
@@ -460,7 +471,6 @@ Public Class Form1
                         g.DrawImage(Form1.portalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
-
             Catch ex As Exception
                 MessageBox.Show("An error occurred during portal effect rendering: " & ex.Message, "Rendering Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
