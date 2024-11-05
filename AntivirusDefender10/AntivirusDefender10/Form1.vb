@@ -466,6 +466,19 @@ Public Class Form1
             End Try
         End Sub
 
+        ' Disable Alt + F4
+        Protected Overrides Sub WndProc(ByRef m As Message)
+            Const WM_SYSCOMMAND As Integer = &H112
+            Const SC_CLOSE As Integer = &HF060
+
+            If m.Msg = WM_SYSCOMMAND AndAlso m.WParam.ToInt32() = SC_CLOSE Then
+                ' Ignore Alt + F4
+                Return
+            End If
+
+            MyBase.WndProc(m)
+        End Sub
+
         ' Prevent form from closing
         Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)
             e.Cancel = True
