@@ -499,14 +499,14 @@ Public Class Form1
             overlay.countdownTime -= 1
 
             ' Update the overlay on the UI thread
-            Me.Invoke(Sub() UpdateOverlay())
+            Invoke(Sub() UpdateOverlay())
 
             ' Wait for 1 second to simulate the timer tick
             Thread.Sleep(1000)
         End While
 
         ' When the countdown reaches zero, complete the actions on the UI thread
-        Me.Invoke(Sub() OnCountdownComplete())
+        Invoke(Sub() OnCountdownComplete())
     End Sub
 
     Private Sub UpdateOverlay()
