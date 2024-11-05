@@ -494,23 +494,28 @@ Public Class Form1
     End Sub
 
     Private Sub CountdownLoop()
-        While overlay.countdownTime > 0
-            overlay.countdownTime -= 1
+        Try
+            While overlay.countdownTime > 0
+                overlay.countdownTime -= 1
+
+                If InvokeRequired Then
+                    BeginInvoke(New Action(Sub() UpdateOverlay()))
+                Else
+                    UpdateOverlay()
+                End If
+
+                Thread.Sleep(1000)
+            End While
 
             If InvokeRequired Then
-                BeginInvoke(New Action(Sub() UpdateOverlay()))
+                BeginInvoke(New Action(Sub() OnCountdownComplete()))
             Else
-                UpdateOverlay()
+                OnCountdownComplete()
             End If
 
-            Thread.Sleep(1000)
-        End While
-
-        If InvokeRequired Then
-            BeginInvoke(New Action(Sub() OnCountdownComplete()))
-        Else
-            OnCountdownComplete()
-        End If
+        Catch ex As Exception
+            MessageBox.Show("An error occurred: " & ex.InnerException?.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Private Sub UpdateOverlay()
