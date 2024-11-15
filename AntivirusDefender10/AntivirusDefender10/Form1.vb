@@ -530,7 +530,7 @@ Public Class Form1
         End If
 
         ' Set up and start the countdown thread
-        countdownTimer.Start()
+        CountDownTimer.Start()
     End Sub
 
     Private Sub UpdateOverlay()
