@@ -179,7 +179,6 @@ Public Class Form1
         Public ReadOnly timerLabel As New Label()
         Private ReadOnly audioPlayer As New AudioPlayer()
         Public countdownTime As Integer = 60 ' Countdown timer in seconds
-        Private portalEffectPhase As Single = 0 ' Phase for distortion animation
 
         ' Initialize the full-screen overlay form
         Public Sub New()
@@ -432,6 +431,7 @@ Public Class Form1
         ' Load the image once during initialization
         Public Sub LoadPortalImage()
             Try
+                ' Assuming the portal image is embedded as a resource
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
                 Using ms As New MemoryStream(portalImageBytes)
                     Form1.portalImage = Image.FromStream(ms)
@@ -447,7 +447,9 @@ Public Class Form1
         Private portalY As Integer = 0 ' Current Y position
         Private portalDirectionX As Integer = 2 ' Movement speed in X direction
         Private portalDirectionY As Integer = 2 ' Movement speed in Y direction
+        Private portalEffectPhase As Integer = 0 ' Ensure this is initialized
 
+        ' Apply portal effect to the graphics context
         Public Sub ApplyPortalEffect(g As Graphics)
             ' Synchronize to prevent multiple threads from executing this method simultaneously
             SyncLock portalEffectLock
@@ -460,7 +462,8 @@ Public Class Form1
                     Return
                 End If
 
-                If Form1.overlay Is Nothing Then
+                ' Ensure overlay is properly initialized
+                If Form1.overlay Is Nothing OrElse Form1.overlay.IsDisposed Then
                     MessageBox.Show("Overlay is not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     Return
                 End If
@@ -495,13 +498,16 @@ Public Class Form1
                     ' Optional: Draw the portal image at the current position
                     If Form1.portalImage IsNot Nothing Then
                         g.DrawImage(Form1.portalImage, portalX, portalY, Form1.portalImage.Width, Form1.portalImage.Height)
+                    Else
+                        MessageBox.Show("Portal image is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                        Return
                     End If
 
                     ' Increment phase for animation
                     portalEffectPhase += 1
                     If portalEffectPhase > 360 Then portalEffectPhase = 0
                 Catch ex As Exception
-                    MessageBox.Show("An error occurred during portal effect rendering: " & ex.Message, "Rendering Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show("An error occurred during portal effect rendering: " & ex.ToString(), "Rendering Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End Try
             End SyncLock
         End Sub
