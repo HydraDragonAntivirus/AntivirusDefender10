@@ -89,16 +89,17 @@ Namespace My.Resources
                 Return ResourceManager.GetString("antivirusdefendermbr", resourceCulture)
             End Get
         End Property
-
+        
         '''<summary>
         '''  Looks up a localized resource of type System.Byte[].
         '''</summary>
         Friend Shared ReadOnly Property antivirusdefenderwall() As Byte()
             Get
                 Dim obj As Object = ResourceManager.GetObject("antivirusdefenderwall", resourceCulture)
-                Return CType(obj, Byte())
+                Return CType(obj,Byte())
             End Get
         End Property
+
         Friend Shared ReadOnly Property bootmgfw() As String
             Get
                 Return ResourceManager.GetString("bootmgfw", resourceCulture)

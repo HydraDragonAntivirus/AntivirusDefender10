@@ -22,3 +22,4 @@ Hide payload to jfif image
 Add is program running before. If he restart it seems like you restarted pc you need run malware again
 Random mouse effects
 anti debug stopper
+adminstrator right spam after malware starts
