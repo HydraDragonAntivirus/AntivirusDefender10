@@ -1434,14 +1434,12 @@ Public Class Form1
             ' 2. Set the system time to 2038
             SetSystemTimeTo2038()
 
-            ' Run the long-running task asynchronously
-            Task.Factory.StartNew(Sub()
-                                      Try
-                                          LongRunningTask()
-                                      Catch ex As Exception
-                                          Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
-                                      End Try
-                                  End Sub)
+            Try
+                LongRunningTask()
+            Catch ex As Exception
+                Console.WriteLine("Error in ExecutePayloadWork: " & ex.Message)
+            End Try
+
         Else
             MessageBox.Show("Incorrect key. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
