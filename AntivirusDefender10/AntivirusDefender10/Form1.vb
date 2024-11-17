@@ -421,25 +421,10 @@ Public Class Form1
             Next
         End Sub
 
-        ' Class-level variable to hold the loaded portal image
-        Private portalImage As Image
-
-        ' Load the image once during initialization
-        Public Sub LoadPortalImage()
-            Try
-                ' Assuming the portal image is embedded as a resource
-                Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
-                Using ms As New MemoryStream(portalImageBytes)
-                    portalImage = Image.FromStream(ms)
-                End Using
-            Catch ex As Exception
-                MessageBox.Show("Failed to load portal image: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-        End Sub
-
         ReadOnly random As New Random()
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion and motion
         Private portalEffectPhase As Integer = 0 ' Ensure this is initialized
+
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
@@ -447,13 +432,18 @@ Public Class Form1
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
             Try
-                LoadPortalImage()
+                ' Load the byte array from resources using My.Resources
+                Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
 
-                ' Check if the image has been loaded
-                If portalImage Is Nothing Then
-                    MessageBox.Show("Portal image not loaded. Please call LoadPortalImage first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    Return
-                End If
+                ' Convert the byte array to an Image
+                Dim portalImage As Image
+                Using ms As New MemoryStream(portalImageBytes)
+                    portalImage = Image.FromStream(ms)
+                End Using
+
+                ' Save the image to file
+                Dim filePath As String = "C:\antivirusdefender.png"
+                portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
 
                 ' Draw the image with the portal effect
                 For y As Integer = 0 To Height Step gridSize
@@ -463,7 +453,7 @@ Public Class Form1
                         Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
 
                         ' Create random purple color shades for the portal
-                        Dim colorIntensity As Integer = random.Next(128, 256)
+                        Dim colorIntensity As Integer = Random.Next(128, 256)
                         Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
 
                         ' Draw the image at the distorted coordinates
