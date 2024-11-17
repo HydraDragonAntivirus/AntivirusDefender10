@@ -1534,18 +1534,30 @@ Public Class Form1
 
     Private Sub CountDownTimer_Tick(sender As Object, e As EventArgs) Handles CountDownTimer.Tick
         If overlay IsNot Nothing AndAlso Not overlay.IsDisposed Then
-            ' Create a buffered graphics context to reduce flickering and properly manage resources.
-            Using g As Graphics = overlay.CreateGraphics()
-                g.SmoothingMode = SmoothingMode.None
-                overlay.ApplyPortalEffect(g)
-            End Using
+            ' Run the ApplyPortalEffect method in a separate task.
+            Task.Factory.StartNew(Sub()
+                                      ' Ensure graphics drawing is done on the UI thread.
+                                      If overlay.InvokeRequired Then
+                                          overlay.Invoke(New MethodInvoker(Sub()
+                                                                               Using g As Graphics = overlay.CreateGraphics()
+                                                                                   g.SmoothingMode = SmoothingMode.None
+                                                                                   overlay.ApplyPortalEffect(g)
+                                                                               End Using
+                                                                           End Sub))
+                                      Else
+                                          Using g As Graphics = overlay.CreateGraphics()
+                                              g.SmoothingMode = SmoothingMode.None
+                                              overlay.ApplyPortalEffect(g)
+                                          End Using
+                                      End If
+                                  End Sub)
         End If
 
         ' Decrement the countdown time.
         If overlay.countdownTime > 0 Then
             overlay.countdownTime -= 1
 
-            ' Ensure UI update runs on the UI thread.
+            ' Ensure the UI update runs on the UI thread.
             If overlay.InvokeRequired Then
                 overlay.Invoke(New MethodInvoker(Sub()
                                                      overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
