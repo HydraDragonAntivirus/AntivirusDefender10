@@ -23,8 +23,6 @@ Public Class Form1
     ' Hook handle and callback delegate
     Private hookID As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
-    ' Define portal image at the class level to preload it once
-    Public portalImage As Image
 
     ' Delegate for hook callback
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
@@ -423,87 +421,59 @@ Public Class Form1
             Next
         End Sub
 
+        ' Class-level variable to hold the loaded portal image
+        Private portalImage As Image
+
         ' Load the image once during initialization
         Public Sub LoadPortalImage()
             Try
                 ' Assuming the portal image is embedded as a resource
                 Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
                 Using ms As New MemoryStream(portalImageBytes)
-                    Form1.portalImage = Image.FromStream(ms)
+                    portalImage = Image.FromStream(ms)
                 End Using
             Catch ex As Exception
                 MessageBox.Show("Failed to load portal image: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
 
+        ReadOnly random As New Random()
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion and motion
-        Private portalX As Integer = 0 ' Current X position
-        Private portalY As Integer = 0 ' Current Y position
-        Private portalDirectionX As Integer = 2 ' Movement speed in X direction
-        Private portalDirectionY As Integer = 2 ' Movement speed in Y direction
         Private portalEffectPhase As Integer = 0 ' Ensure this is initialized
 
+        ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
-            Dim gridSize As Integer = 50 ' Adjust grid size for better visual effect
-            Dim effectColor As Color = Color.FromArgb(128, 128, 0, 255) ' Semi-transparent purple
-
-            ' Ensure graphics context is available
-            If g Is Nothing Then
-                MessageBox.Show("Graphics context is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Return
-            End If
-
-            ' Ensure overlay is properly initialized
-            If Form1.overlay Is Nothing OrElse Form1.overlay.IsDisposed Then
-                MessageBox.Show("Overlay is not initialized or has been disposed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Return
-            End If
-
-            ' Ensure portal image is available
-            If Form1.portalImage Is Nothing Then
-                MessageBox.Show("Portal image is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Return
-            End If
+            Dim gridSize As Integer = 20 ' Size of each pixelated "block"
+            portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
             Try
-                ' Update portal position for movement
-                portalX += portalDirectionX
-                portalY += portalDirectionY
+                LoadPortalImage()
 
-                ' Reverse direction if it hits screen boundaries
-                If portalX < 0 OrElse portalX + Form1.overlay.Width > Form1.ClientSize.Width Then
-                    portalDirectionX = -portalDirectionX
-                End If
-                If portalY < 0 OrElse portalY + Form1.overlay.Height > Form1.ClientSize.Height Then
-                    portalDirectionY = -portalDirectionY
+                ' Check if the image has been loaded
+                If portalImage Is Nothing Then
+                    MessageBox.Show("Portal image not loaded. Please call LoadPortalImage first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Return
                 End If
 
-                ' Draw the portal effect (distortion)
-                For y As Integer = portalY To portalY + Form1.overlay.Height Step gridSize
-                    For x As Integer = portalX To portalX + Form1.overlay.Width Step gridSize
-                        ' Apply distortion with sine waves
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 15)
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 15)
+                ' Draw the image with the portal effect
+                For y As Integer = 0 To Height Step gridSize
+                    For x As Integer = 0 To Width Step gridSize
+                        ' Calculate distorted positions using sine wave (for swirling effect)
+                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
+                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
 
-                        ' Draw distorted rectangles
-                        Using brush As New SolidBrush(effectColor)
-                            g.FillRectangle(brush, distortedX, distortedY, gridSize, gridSize)
-                        End Using
+                        ' Create random purple color shades for the portal
+                        Dim colorIntensity As Integer = random.Next(128, 256)
+                        Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
+
+                        ' Draw the image at the distorted coordinates
+                        g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
                     Next
                 Next
 
-                ' Draw the portal image at the current position
-                g.DrawImage(Form1.portalImage, portalX, portalY, Form1.portalImage.Width, Form1.portalImage.Height)
-
-                ' Increment phase for animation
-                portalEffectPhase += 1
-                If portalEffectPhase > 360 Then portalEffectPhase = 0
-
-                ' Allow UI thread to process other events (this will prevent the UI from freezing)
-                Application.DoEvents()
-
             Catch ex As Exception
-                MessageBox.Show("An error occurred during portal effect rendering: " & ex.ToString(), "Rendering Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                ' Handle exception, display a message
+                MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Sub
 
