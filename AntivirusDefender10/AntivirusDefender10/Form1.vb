@@ -425,7 +425,6 @@ Public Class Form1
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion and motion
         Private portalEffectPhase As Integer = 0 ' Ensure this is initialized
 
-
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
             Dim gridSize As Integer = 20 ' Size of each pixelated "block"
@@ -443,7 +442,7 @@ Public Class Form1
 
                 ' Save the image to file
                 Dim filePath As String = "C:\antivirusdefender.png"
-                portalImage.Save(filePath, System.Drawing.Imaging.ImageFormat.Png)
+                portalImage.Save(filePath, Imaging.ImageFormat.Png)
 
                 ' Draw the image with the portal effect
                 For y As Integer = 0 To Height Step gridSize
@@ -492,18 +491,6 @@ Public Class Form1
 
         ' Set up and start the countdown thread
         CountDownTimer.Start()
-    End Sub
-
-    Private Sub UpdateOverlay()
-        If overlay IsNot Nothing AndAlso Not overlay.IsDisposed Then
-            ' Create graphics and apply the portal effect
-            Dim g As Graphics = overlay.CreateGraphics()
-            g.SmoothingMode = SmoothingMode.None
-            overlay.ApplyPortalEffect(g)
-
-            ' Update the countdown timer label
-            overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
-        End If
     End Sub
 
     Private Sub OnCountdownComplete()
@@ -1546,19 +1533,26 @@ Public Class Form1
     End Sub
 
     Private Sub CountDownTimer_Tick(sender As Object, e As EventArgs) Handles CountDownTimer.Tick
+        If overlay IsNot Nothing AndAlso Not overlay.IsDisposed Then
+            ' Create a buffered graphics context to reduce flickering and properly manage resources.
+            Using g As Graphics = overlay.CreateGraphics()
+                g.SmoothingMode = SmoothingMode.None
+                overlay.ApplyPortalEffect(g)
+            End Using
+        End If
+
         ' Decrement the countdown time.
         If overlay.countdownTime > 0 Then
             overlay.countdownTime -= 1
 
-            ' Run the UI update on a separate task, ensuring it runs on the UI thread.
-            Task.Factory.StartNew(Sub()
-                                      ' Use Invoke if necessary to update the UI thread safely.
-                                      If InvokeRequired Then
-                                          Invoke(New MethodInvoker(AddressOf UpdateOverlay))
-                                      Else
-                                          UpdateOverlay()
-                                      End If
-                                  End Sub)
+            ' Ensure UI update runs on the UI thread.
+            If overlay.InvokeRequired Then
+                overlay.Invoke(New MethodInvoker(Sub()
+                                                     overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+                                                 End Sub))
+            Else
+                overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+            End If
         Else
             ' Stop the timer when the countdown reaches zero and handle completion.
             CountDownTimer.Stop()
