@@ -18,6 +18,7 @@ Public Class Form1
     Private Const VK_LWIN As Integer = &H5B
     Private Const VK_RWIN As Integer = &H5C
     ' Hook handle and callback delegate
+    Public hookID As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
 
     ' Delegate for hook callback
