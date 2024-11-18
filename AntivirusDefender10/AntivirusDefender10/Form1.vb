@@ -25,7 +25,7 @@ Public Class Form1
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
     ' Correct declaration
-    Public fullScreenOverlay As Form2
+    Dim fullScreenOverlay As New Form2()
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
@@ -809,14 +809,7 @@ Public Class Form1
                 ActivateButton.Enabled = False
             End If
 
-            ' Start the Form2 safely
-            Try
-                Task.Factory.StartNew(Sub()
-                                          Form2.Show()
-                                      End Sub)
-            Catch ex As Exception
-                MessageBox.Show("Error in showing Form2: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
+            fullScreenOverlay.Show()
 
             ' Start the animation loop safely
             Try
