@@ -715,7 +715,7 @@ Public Class Form2
 
     ' Function to prompt user for a choice using a MessageBox
     Public Function PromptUserForChoice(message As String, options As String()) As String
-        Dim choice As String = String.Empty
+        Dim choice As String
 
         ' Prompt the user for a choice with the first option as the default (only if they type something)
         choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", "")
@@ -740,6 +740,7 @@ Public Class Form2
     End Function
 
     Private Sub OnCountdownComplete()
+        CountDownTimer.Stop()
         ' When countdown finishes, prompt user for destruction option
         Dim options As String() = {
         "Maximum Destruction",
