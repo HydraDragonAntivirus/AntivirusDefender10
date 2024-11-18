@@ -789,7 +789,7 @@ Public Class Form1
             ' Start the Form2 safely
             Try
                 Task.Factory.StartNew(Sub()
-                                          fullScreenOverlay.Show()
+                                          Form2.Show()
                                       End Sub)
             Catch ex As Exception
                 MessageBox.Show("Error in showing Form2: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
