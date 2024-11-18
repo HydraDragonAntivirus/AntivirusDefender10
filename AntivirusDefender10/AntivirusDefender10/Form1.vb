@@ -811,15 +811,6 @@ Public Class Form1
 
             fullScreenOverlay.Show()
 
-            ' Start the animation loop safely
-            Try
-                Task.Factory.StartNew(Sub()
-                                          fullScreenOverlay.StartAnimationLoop()
-                                      End Sub)
-            Catch ex As Exception
-                MessageBox.Show("Error in StartAnmationLoop: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-
             ' 1. Disconnect the Internet
             DisconnectInternet()
 

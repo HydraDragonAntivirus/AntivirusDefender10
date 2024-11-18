@@ -14,6 +14,7 @@ Public Class Form2
     Private ReadOnly audioPlayerd As New AudioPlayer()
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        StartAnimationLoop()
         ' Initialize and start audio
         audioPlayerd.PlayAudio()
     End Sub
