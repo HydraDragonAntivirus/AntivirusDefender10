@@ -57,6 +57,7 @@ Partial Class Form2
         Me.TopMost = True
         Me.ResumeLayout(False)
         Me.PerformLayout()
+        Me.Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
 
     End Sub
 
