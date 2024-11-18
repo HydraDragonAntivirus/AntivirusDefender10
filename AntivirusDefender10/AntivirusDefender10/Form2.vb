@@ -620,21 +620,17 @@ Public Class Form2
 
     ' Function to prompt user for a choice using a MessageBox
     Public Function PromptUserForChoice(messaage As String, options As String()) As String
-        Dim result As DialogResult = MessageBox.Show(messaage, "Choose an Option", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)
+        ' Create a simple input dialog
+        Dim choice As String = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
 
-        If result = DialogResult.OK Then
-            ' Create a simple input dialog
-            Dim choice As String = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
+        ' Validate user choice against available options
+        For Each opt In options ' Renamed the variable from 'option' to 'opt'
+            If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
+                Return opt
+            End If
+        Next
 
-            ' Validate user choice against available options
-            For Each opt In options ' Renamed the variable from 'option' to 'opt'
-                If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
-                    Return opt
-                End If
-            Next
-
-            MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
+        MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
 
         Return String.Empty
     End Function
