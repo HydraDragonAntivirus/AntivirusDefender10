@@ -45,7 +45,7 @@ Public Class Form1
 
             ' Set up the low-level keyboard hook
             hookCallbackDelegate = New HookProc(AddressOf HookCallback)
-            hookID = SetHook(hookCallbackDelegate) ' Initialize hookID here
+            hookId = SetHook(hookCallbackDelegate) ' Initialize hookID here
 
             ' Grant self permissions
             Try
@@ -199,6 +199,7 @@ Public Class Form1
     Private Const VK_TAB As Integer = &H9
     Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
 
+    ' Hook callback function
     Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
         If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
             Dim vkCode As Integer = Marshal.ReadInt32(lParam)
@@ -209,17 +210,17 @@ Public Class Form1
             End If
 
             ' Ignore Alt+Tab combination
-            If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+            If vkCode = &H9 AndAlso (GetAsyncKeyState(&H12) And &H8000) <> 0 Then
                 Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
             End If
 
             ' Prevent Alt + F4
-            If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+            If vkCode = &H73 AndAlso (GetAsyncKeyState(&H12) And &H8000) <> 0 Then
                 Return CType(1, IntPtr) ' Prevent Alt + F4
             End If
         End If
 
-        Return CallNextHookEx(hookID, nCode, wParam, lParam)
+        Return CallNextHookEx(hookId, nCode, wParam, lParam)
     End Function
 
     ' Prevent form from closing
