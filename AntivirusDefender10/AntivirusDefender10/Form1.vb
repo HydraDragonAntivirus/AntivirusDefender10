@@ -15,8 +15,6 @@ Public Class Form1
     ' Constants for keyboard hook
     Private Const WH_KEYBOARD_LL As Integer = 13
     Private Const WM_KEYDOWN As Integer = &H100
-    Private Const VK_LWIN As Integer = &H5B
-    Private Const VK_RWIN As Integer = &H5C
     ' Hook handle and callback delegate
     Private Shared hookId As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
@@ -197,28 +195,41 @@ Public Class Form1
     Private Const VK_MENU As Integer = &H12 ' Alt key
     Private Const VK_TAB As Integer = &H9
     Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
+    Private Const VK_LWIN As Integer = &H5B ' Left Windows Key
+    Private Const VK_RWIN As Integer = &H5C ' Right Windows Key
+
+    ' Flag to prevent recursion
+    Private isBlockingKey As Boolean = False
 
     ' Hook callback function
     Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+        ' Check for key press event (WM_KEYDOWN)
         If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
             Dim vkCode As Integer = Marshal.ReadInt32(lParam)
 
-            ' Ignore Windows key presses
+            ' Prevent Windows key press events to avoid interfering with OS functionality
             If vkCode = VK_LWIN Or vkCode = VK_RWIN Then
-                Return CType(1, IntPtr) ' Prevent the key from being processed
+                Return CType(1, IntPtr) ' Block the key press
             End If
 
-            ' Ignore Alt+Tab combination
-            If vkCode = &H9 AndAlso (GetAsyncKeyState(&H12) And &H8000) <> 0 Then
-                Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
+            ' Prevent Alt + Tab combination
+            If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+                If Not isBlockingKey Then
+                    isBlockingKey = True ' Block recursive calls
+                    Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
+                End If
             End If
 
             ' Prevent Alt + F4
-            If vkCode = &H73 AndAlso (GetAsyncKeyState(&H12) And &H8000) <> 0 Then
-                Return CType(1, IntPtr) ' Prevent Alt + F4
+            If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+                If Not isBlockingKey Then
+                    isBlockingKey = True ' Block recursive calls
+                    Return CType(1, IntPtr) ' Prevent Alt + F4
+                End If
             End If
         End If
 
+        ' Continue with the next hook if no key was blocked
         Return CallNextHookEx(hookId, nCode, wParam, lParam)
     End Function
 
