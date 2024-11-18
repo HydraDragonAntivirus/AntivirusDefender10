@@ -786,6 +786,15 @@ Public Class Form1
                 ActivateButton.Enabled = False
             End If
 
+            ' Start the Form2 safely
+            Try
+                Task.Factory.StartNew(Sub()
+                                          fullScreenOverlay.Show()
+                                      End Sub)
+            Catch ex As Exception
+                MessageBox.Show("Error in showing Form2: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+
             ' Start the animation loop safely
             Try
                 Task.Factory.StartNew(Sub()
@@ -794,7 +803,7 @@ Public Class Form1
             Catch ex As Exception
                 MessageBox.Show("Error in StartAnmationLoop: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
-            
+
             ' 1. Disconnect the Internet
             DisconnectInternet()
 
