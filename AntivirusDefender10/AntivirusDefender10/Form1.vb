@@ -482,15 +482,19 @@ Public Class Form1
     Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
 
     Private Sub StartAnimationLoop()
-        ' Initialize and display the overlay if it doesn't already exist
+        ' Check if the overlay is disposed or not visible and show it if necessary
         If overlay Is Nothing OrElse overlay.IsDisposed Then
-            overlay = New FullScreenOverlay()
+            overlay = New FullScreenOverlay() ' Create a new instance only if needed
             AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
             overlay.Show()
+        ElseIf Not overlay.Visible Then
+            overlay.Show() ' Show the existing overlay if it is hidden
         End If
 
-        ' Set up and start the countdown thread
-        CountDownTimer.Start()
+        ' Start the countdown timer if it is not already running
+        If Not CountDownTimer.Enabled Then
+            CountDownTimer.Start()
+        End If
     End Sub
 
     Private Sub OnCountdownComplete()
