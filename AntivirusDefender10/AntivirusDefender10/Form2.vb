@@ -13,14 +13,7 @@ Public Class Form2
     Public countdownTime As Integer = 60 ' Countdown timer in seconds
     Private ReadOnly audioPlayerd As New AudioPlayer()
 
-    ' Initialize the full-screen overlay form
-    Public Sub New()
-        FormBorderStyle = FormBorderStyle.None
-        Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
-        TopMost = True ' Keeps form on top of other windows
-        BackColor = Color.Black
-        Opacity = 0.7 ' Transparency setting
-
+    Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Initialize and start audio
         audioPlayerd.PlayAudio()
     End Sub
@@ -579,5 +572,4 @@ Public Class Form2
             OnCountdownComplete()
         End If
     End Sub
-
 End Class
