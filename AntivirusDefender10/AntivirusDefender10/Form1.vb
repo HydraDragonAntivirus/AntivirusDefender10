@@ -173,17 +173,13 @@ Public Class Form1
         Private ReadOnly audioPlayer As New AudioPlayer()
         Public countdownTime As Integer = 60 ' Countdown timer in seconds
 
-        ' Initialize the full-screen fullScreenOverlay form
+        ' Initialize the full-screen overlay form
         Public Sub New()
             FormBorderStyle = FormBorderStyle.None
             Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
             TopMost = True ' Keeps form on top of other windows
             BackColor = Color.Black
             Opacity = 0.7 ' Transparency setting
-            ' Set form properties for full screen
-            WindowState = FormWindowState.Maximized
-            ' Enable double buffering
-            DoubleBuffered = True
 
             ' Initialize and display the timer label
             timerLabel.AutoSize = True
@@ -191,9 +187,9 @@ Public Class Form1
             timerLabel.Font = New Font("Segoe UI", 20, FontStyle.Bold)
             timerLabel.Location = New Point(10, 10) ' Position of the timer on the screen
             Controls.Add(timerLabel)
+
             ' Initialize and start audio
             audioPlayer.PlayAudio()
-
         End Sub
 
         ' Public method to run the VBS script.
