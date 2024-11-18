@@ -565,8 +565,7 @@ Public Class Form2
                 timerLabel.Text = "Remaining Time: " & countdownTime.ToString() & " seconds"
             End If
 
-            ' Optionally, you can apply an effect here
-            ApplyPortalEffect() ' Replace this with your method or logic for applying the effect
+            ApplyPortalEffect()
         Else
             ' Stop the timer when the countdown reaches zero and handle completion
             OnCountdownComplete()
