@@ -7,8 +7,8 @@ Imports System.Media
 
 Public Class Form2
 
-    ' Create a global instance of Form1
-    Public Form1d As New Form1()
+    ' Correct declaration
+    Dim Form1d As New Form1()
 
     Public countdownTime As Integer = 60 ' Countdown timer in seconds
     Private ReadOnly audioPlayerd As New AudioPlayer()
