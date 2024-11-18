@@ -8,7 +8,6 @@
     Private footerPanel As Panel
     ' Initialize form components
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.headerPanel = New System.Windows.Forms.Panel()
         Me.titleLabel = New System.Windows.Forms.Label()
@@ -17,7 +16,6 @@
         Me.ActivateButton = New System.Windows.Forms.Button()
         Me.ExitButton = New System.Windows.Forms.Button()
         Me.footerPanel = New System.Windows.Forms.Panel()
-        Me.CountDownTimer = New System.Windows.Forms.Timer(Me.components)
         Me.headerPanel.SuspendLayout()
         Me.footerPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -103,10 +101,6 @@
         Me.footerPanel.Size = New System.Drawing.Size(600, 50)
         Me.footerPanel.TabIndex = 4
         '
-        'CountDownTimer
-        '
-        Me.CountDownTimer.Interval = 1000
-        '
         'Form1
         '
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer), CType(CType(30, Byte), Integer))
@@ -159,5 +153,4 @@
         g.DrawString(button.Text, button.Font, glowBrush, New PointF(5, 5))
     End Sub
     Private components As System.ComponentModel.IContainer
-    Friend WithEvents CountDownTimer As Timer
 End Class
