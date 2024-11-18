@@ -566,12 +566,10 @@ Public Class Form2
                 Case "Surprise Me"
                     ' Code for less destructive surprise
                     timerLabel.Text = "Deep Freeze user detected! Non-destructive request declined."
-                    Thread.Sleep(5000)
 
                 Case "Just Make Unusable My PC Without Destruction"
                     ' Code for access restrictions
                     timerLabel.Text = "Deep Freeze user detected! Non-destructive request declined."
-                    Thread.Sleep(5000)
 
                 Case Else
                     timerLabel.Text = "Invalid choice!"
@@ -777,6 +775,8 @@ Public Class Form2
 
             ApplyPortalEffect()
         Else
+            ' Remove the form from being topmost before completing the countdown
+            TopMost = False ' Remove from topmost
             ' Stop the timer when the countdown reaches zero and handle completion
             OnCountdownComplete()
         End If
