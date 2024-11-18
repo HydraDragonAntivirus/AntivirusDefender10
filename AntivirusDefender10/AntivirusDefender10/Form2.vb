@@ -766,8 +766,8 @@ Public Class Form2
             ' Update the countdown UI (ensure it's on the UI thread)
             If timerLabel.InvokeRequired Then
                 timerLabel.Invoke(New MethodInvoker(Sub()
-                                                        ' Simulate mouse click on Form2 at a specific location (e.g., (100, 100))
-                                                        SimulateMouseClick(100, 100)
+                                                        ' Simulate mouse click on Form2 at a specific location (e.g., (400, 400))
+                                                        SimulateMouseClick(400, 400)
                                                         timerLabel.Text = "Remaining Time: " & countdownTime.ToString() & " seconds"
                                                     End Sub))
             Else
