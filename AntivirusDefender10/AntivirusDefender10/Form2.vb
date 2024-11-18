@@ -619,20 +619,26 @@ Public Class Form2
     End Sub
 
     ' Function to prompt user for a choice using a MessageBox
-    Public Function PromptUserForChoice(messaage As String, options As String()) As String
-        ' Create a simple input dialog
-        Dim choice As String = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
+    Public Function PromptUserForChoice(message As String, options As String()) As String
+        Dim choice As String = String.Empty
 
-        ' Validate user choice against available options
-        For Each opt In options ' Renamed the variable from 'option' to 'opt'
-            If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
-                Return opt
-            End If
-        Next
+        ' Keep prompting the user until a valid choice is made
+        Do
+            choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
 
-        MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            ' Validate user choice against available options
+            For Each opt In options ' Renamed the variable from 'option' to 'opt'
+                If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
+                    Return opt ' Return the valid choice
+                End If
+            Next
 
-        Return String.Empty
+            ' If the choice is invalid, display an error message and prompt again
+            MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+        Loop While String.IsNullOrEmpty(choice) OrElse Not options.Contains(choice)
+
+        Return String.Empty ' This line will never be reached because the loop will exit on a valid choice
     End Function
 
     ' Execute a system command
