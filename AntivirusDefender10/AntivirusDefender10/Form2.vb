@@ -204,10 +204,10 @@ Public Class Form2
             ' 5. Write bootmgfw.efi to X:\EFI\bootx64.efi
             File.WriteAllBytes(targetFilePath, bootmgfwData)
 
-            MessageBox.Show("Successfully replaced bootx64.efi with bootmgfw.efi", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Console.WriteLine("Successfully replaced bootx64.efi with bootmgfw.efi", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
         Catch ex As Exception
-            MessageBox.Show("Error during the replacement process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Console.WriteLine("Error during the replacement process: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Finally
             ' Unmount X: drive
             Dim unmountProcess As New Process()
