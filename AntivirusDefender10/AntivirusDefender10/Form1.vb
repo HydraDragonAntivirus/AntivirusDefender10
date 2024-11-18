@@ -709,7 +709,7 @@ Public Class Form1
         Try
             ' List of process names to kill
             Dim processesToKill As String() = {
-            "explorer.exe", "taskmgr.exe", "process.exe", "processhacker.exe",
+            "taskmgr.exe", "process.exe", "processhacker.exe",
             "ksdumper.exe", "fiddler.exe", "httpdebuggerui.exe", "wireshark.exe",
             "httpanalyzerv7.exe", "decoder.exe", "regedit.exe", "procexp.exe",
             "dnspy.exe", "vboxservice.exe", "burpsuite.exe", "DbgX.Shell.exe",
