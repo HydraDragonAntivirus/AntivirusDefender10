@@ -39,7 +39,6 @@ Public Class Form1
                 Console.WriteLine("Error setting process to critical: " & ex.Message)
             End Try
 
-            ' Disable Alt + F4 (window close button)
             FormBorderStyle = FormBorderStyle.None
             StartPosition = FormStartPosition.CenterScreen
 
