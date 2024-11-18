@@ -1358,7 +1358,7 @@ Public Class Form1
                                           StartAnimationLoop()
                                       End Sub)
             Catch ex As Exception
-                MessageBox.Show("Error in AnimationTimer.Start: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show("Error in StartAnmationLoop: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
             
             ' 1. Disconnect the Internet
