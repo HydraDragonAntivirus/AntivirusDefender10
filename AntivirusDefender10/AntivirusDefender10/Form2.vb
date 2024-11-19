@@ -74,24 +74,39 @@ Public Class Form2
         If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
             Dim vkCode As Integer = Marshal.ReadInt32(lParam)
 
-            ' Prevent Windows key press events to avoid interfering with OS functionality
-            If vkCode = VK_LWIN Or vkCode = VK_RWIN Then
-                Return CType(1, IntPtr) ' Block the key press
+            ' Prevent Windows key press events
+            If (vkCode = VK_LWIN Or vkCode = VK_RWIN) Then
+                If Not isBlockingKey Then
+                    isBlockingKey = True ' Set flag to prevent recursion
+                    Try
+                        Return CType(1, IntPtr) ' Block Windows key press
+                    Finally
+                        isBlockingKey = False ' Reset the flag
+                    End Try
+                End If
             End If
 
             ' Prevent Alt + Tab combination
             If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
                 If Not isBlockingKey Then
-                    isBlockingKey = True ' Block recursive calls
-                    Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
+                    isBlockingKey = True ' Set flag to prevent recursion
+                    Try
+                        Return CType(1, IntPtr) ' Block Alt + Tab
+                    Finally
+                        isBlockingKey = False ' Reset the flag
+                    End Try
                 End If
             End If
 
             ' Prevent Alt + F4
             If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
                 If Not isBlockingKey Then
-                    isBlockingKey = True ' Block recursive calls
-                    Return CType(1, IntPtr) ' Prevent Alt + F4
+                    isBlockingKey = True ' Set flag to prevent recursion
+                    Try
+                        Return CType(1, IntPtr) ' Block Alt + F4
+                    Finally
+                        isBlockingKey = False ' Reset the flag
+                    End Try
                 End If
             End If
         End If
