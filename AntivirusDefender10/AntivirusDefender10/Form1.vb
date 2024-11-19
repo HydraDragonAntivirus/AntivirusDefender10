@@ -12,16 +12,6 @@ Imports System.Threading.Tasks
 Public Class Form1
     Inherits Form
 
-    ' Constants for keyboard hook
-    Private Const WH_KEYBOARD_LL As Integer = 13
-    Private Const WM_KEYDOWN As Integer = &H100
-    ' Hook handle and callback delegate
-    Private Shared hookId As IntPtr = IntPtr.Zero
-    Private hookCallbackDelegate As HookProc
-
-    ' Delegate for hook callback
-    Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
-
     ' Correct declaration
     Dim fullScreenOverlay As New Form2()
 
@@ -40,10 +30,6 @@ Public Class Form1
             FormBorderStyle = FormBorderStyle.None
             StartPosition = FormStartPosition.CenterScreen
 
-            ' Set up the low-level keyboard hook
-            hookCallbackDelegate = New HookProc(AddressOf HookCallback)
-            hookId = SetHook(hookCallbackDelegate) ' Initialize hookID here
-
             ' Grant self permissions
             Try
                 GrantSelfPermissions()
@@ -55,24 +41,6 @@ Public Class Form1
             MessageBox.Show("An error occurred during initialization: " & ex.Message, "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
-
-    ' Windows API declarations
-    <DllImport("kernel32.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
-    Private Shared Function GetModuleHandle(lpModuleName As String) As IntPtr
-    End Function
-
-    <DllImport("user32.dll")>
-    Private Shared Function SetWindowsHookEx(idHook As Integer, lpfn As HookProc, hMod As IntPtr, dwThreadId As UInteger) As IntPtr
-    End Function
-
-    ' Set up the low-level keyboard hook
-    Private Function SetHook(proc As HookProc) As IntPtr
-        Using curProc As Process = Process.GetCurrentProcess()
-            Using curModule As ProcessModule = curProc.MainModule
-                Return SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(Nothing), 0)
-            End Using
-        End Using
-    End Function
 
     ' Declare the SYSTEMTIME structure for setting the date
     <StructLayout(LayoutKind.Sequential)>
@@ -90,10 +58,6 @@ Public Class Form1
     ' Declare the SetLocalTime API function
     <DllImport("kernel32.dll", SetLastError:=True)>
     Private Shared Function SetLocalTime(ByRef time As SYSTEMTIME) As Boolean
-    End Function
-
-    <DllImport("user32.dll")>
-    Private Shared Function CallNextHookEx(hhk As IntPtr, nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
     End Function
 
     <DllImport("kernel32")>
@@ -186,52 +150,6 @@ Public Class Form1
         End Sub
 
     End Class
-
-    ' Declare the GetAsyncKeyState function
-    <DllImport("user32.dll")>
-    Private Shared Function GetAsyncKeyState(vKey As Integer) As Short
-    End Function
-
-    Private Const VK_MENU As Integer = &H12 ' Alt key
-    Private Const VK_TAB As Integer = &H9
-    Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
-    Private Const VK_LWIN As Integer = &H5B ' Left Windows Key
-    Private Const VK_RWIN As Integer = &H5C ' Right Windows Key
-
-    ' Flag to prevent recursion
-    Private isBlockingKey As Boolean = False
-
-    ' Hook callback function
-    Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
-        ' Check for key press event (WM_KEYDOWN)
-        If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
-            Dim vkCode As Integer = Marshal.ReadInt32(lParam)
-
-            ' Prevent Windows key press events to avoid interfering with OS functionality
-            If vkCode = VK_LWIN Or vkCode = VK_RWIN Then
-                Return CType(1, IntPtr) ' Block the key press
-            End If
-
-            ' Prevent Alt + Tab combination
-            If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
-                If Not isBlockingKey Then
-                    isBlockingKey = True ' Block recursive calls
-                    Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
-                End If
-            End If
-
-            ' Prevent Alt + F4
-            If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
-                If Not isBlockingKey Then
-                    isBlockingKey = True ' Block recursive calls
-                    Return CType(1, IntPtr) ' Prevent Alt + F4
-                End If
-            End If
-        End If
-
-        ' Continue with the next hook if no key was blocked
-        Return CallNextHookEx(hookId, nCode, wParam, lParam)
-    End Function
 
     ' Prevent form from closing
     Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)

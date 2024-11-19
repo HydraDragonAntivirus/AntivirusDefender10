@@ -11,12 +11,93 @@ Public Class Form2
 
     Public countdownTime As Integer = 60 ' Countdown timer in seconds
     Private ReadOnly audioPlayerd As New AudioPlayer()
+    Private Const WM_KEYDOWN As Integer = &H100
+    Private hookCallbackDelegate As HookProc
+    ' Delegate for hook callback
+    Private Delegate Function HookProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    ' Constants for keyboard hook
+    Private Const WH_KEYBOARD_LL As Integer = 13
+
+    ' Windows API declarations
+    <DllImport("kernel32.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
+    Private Shared Function GetModuleHandle(lpModuleName As String) As IntPtr
+    End Function
+
+    <DllImport("user32.dll")>
+    Private Shared Function SetWindowsHookEx(idHook As Integer, lpfn As HookProc, hMod As IntPtr, dwThreadId As UInteger) As IntPtr
+    End Function
+
+    ' Set up the low-level keyboard hook
+    Private Function SetHook(proc As HookProc) As IntPtr
+        Using curProc As Process = Process.GetCurrentProcess()
+            Using curModule As ProcessModule = curProc.MainModule
+                Return SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(Nothing), 0)
+            End Using
+        End Using
+    End Function
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Set up the low-level keyboard hook
+        hookCallbackDelegate = New HookProc(AddressOf HookCallback)
+        hookId = SetHook(hookCallbackDelegate) ' Initialize hookID here
+
         StartAnimationLoop()
         ' Initialize and start audio
         audioPlayerd.PlayAudio()
     End Sub
+
+    ' Declare the GetAsyncKeyState function
+    <DllImport("user32.dll")>
+    Private Shared Function GetAsyncKeyState(vKey As Integer) As Short
+    End Function
+
+    <DllImport("user32.dll")>
+    Private Shared Function CallNextHookEx(hhk As IntPtr, nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    End Function
+
+    ' Hook handle and callback delegate
+    Private Shared hookId As IntPtr = IntPtr.Zero
+
+    ' Flag to prevent recursion
+    Private isBlockingKey As Boolean = False
+
+    Private Const VK_MENU As Integer = &H12 ' Alt key
+    Private Const VK_TAB As Integer = &H9
+    Private Const VK_F4 As Integer = &H73 ' Virtual Key Code for F4
+    Private Const VK_LWIN As Integer = &H5B ' Left Windows Key
+    Private Const VK_RWIN As Integer = &H5C ' Right Windows Key
+
+    ' Hook callback function
+    Private Function HookCallback(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+        ' Check for key press event (WM_KEYDOWN)
+        If nCode >= 0 AndAlso wParam = CType(WM_KEYDOWN, IntPtr) Then
+            Dim vkCode As Integer = Marshal.ReadInt32(lParam)
+
+            ' Prevent Windows key press events to avoid interfering with OS functionality
+            If vkCode = VK_LWIN Or vkCode = VK_RWIN Then
+                Return CType(1, IntPtr) ' Block the key press
+            End If
+
+            ' Prevent Alt + Tab combination
+            If vkCode = VK_TAB AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+                If Not isBlockingKey Then
+                    isBlockingKey = True ' Block recursive calls
+                    Return CType(1, IntPtr) ' Prevent the Alt+Tab combination
+                End If
+            End If
+
+            ' Prevent Alt + F4
+            If vkCode = VK_F4 AndAlso (GetAsyncKeyState(VK_MENU) And &H8000) <> 0 Then
+                If Not isBlockingKey Then
+                    isBlockingKey = True ' Block recursive calls
+                    Return CType(1, IntPtr) ' Prevent Alt + F4
+                End If
+            End If
+        End If
+
+        ' Continue with the next hook if no key was blocked
+        Return CallNextHookEx(hookId, nCode, wParam, lParam)
+    End Function
 
     Public Class AudioPlayer
         Implements IDisposable
@@ -162,7 +243,7 @@ Public Class Form2
             process.WaitForExit()
 
             If Not String.IsNullOrEmpty(output) Then
-                MessageBox.Show("Output: " & output, "Script Output", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Console.WriteLine("Output: " & output, "Script Output", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
 
             If Not String.IsNullOrEmpty(errorOutput) Then
