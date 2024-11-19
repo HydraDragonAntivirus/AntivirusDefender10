@@ -25,3 +25,4 @@ anti debug stopper
 adminstrator right spam after malware starts
 ICO for 32 48 64 128 256
 Jigsaw like text creation instead of Notepad
+Remove log off from windows close button
