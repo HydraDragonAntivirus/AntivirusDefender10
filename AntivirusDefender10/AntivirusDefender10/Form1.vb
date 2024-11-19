@@ -4,10 +4,9 @@ Imports System.Management
 Imports System.Runtime.InteropServices
 Imports System.Security.AccessControl
 Imports System.Security.Principal
-Imports System.Text
 Imports System.Threading
-Imports Microsoft.Win32
 Imports System.Threading.Tasks
+Imports Microsoft.Win32
 
 Public Class Form1
     Inherits Form
