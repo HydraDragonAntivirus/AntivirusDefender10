@@ -125,9 +125,7 @@ Public Class Form2
 
             ' Update registry keys
             Using setupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(setupKeyPath)
-                If setupKey IsNot Nothing Then
-                    setupKey.SetValue("CmdLine", batFilePath, RegistryValueKind.String)
-                End If
+                setupKey.SetValue("CmdLine", batFilePath, RegistryValueKind.String)
             End Using
 
             Using systemSetupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(systemSetupKeyPath)
