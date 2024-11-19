@@ -23,3 +23,4 @@ Add is program running before. If he restart it seems like you restarted pc you 
 Random mouse effects
 anti debug stopper
 adminstrator right spam after malware starts
+ICO for 32 48 64 128 256

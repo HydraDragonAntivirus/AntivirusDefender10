@@ -26,6 +26,8 @@ Partial Class Form2
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form2))
         Me.CountDownTimer = New System.Windows.Forms.Timer(Me.components)
         Me.timerLabel = New System.Windows.Forms.Label()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'CountDownTimer
@@ -43,11 +45,21 @@ Partial Class Form2
         Me.timerLabel.TabIndex = 0
         Me.timerLabel.Text = "Remaning Time:"
         '
+        'PictureBox1
+        '
+        Me.PictureBox1.Image = CType(resources.GetObject("PictureBox1.Image"), System.Drawing.Image)
+        Me.PictureBox1.Location = New System.Drawing.Point(-42, 72)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(900, 600)
+        Me.PictureBox1.TabIndex = 6
+        Me.PictureBox1.TabStop = False
+        '
         'Form2
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(230, 65)
+        Me.ClientSize = New System.Drawing.Size(1366, 768)
+        Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.timerLabel)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -55,11 +67,13 @@ Partial Class Form2
         Me.Opacity = 0.7R
         Me.Text = "Form2"
         Me.TopMost = True
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
-        Me.Bounds = Screen.PrimaryScreen.Bounds ' Set form to full-screen
+
     End Sub
 
     Friend WithEvents CountDownTimer As Timer
     Friend WithEvents timerLabel As Label
+    Friend WithEvents PictureBox1 As PictureBox
 End Class
