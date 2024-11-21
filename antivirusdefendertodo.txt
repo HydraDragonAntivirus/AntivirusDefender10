@@ -27,3 +27,4 @@ ICO for 32 48 64 128 256
 Jigsaw like text creation instead of Notepad
 Remove log off from windows close button
 Add Keyboard Test Utility detector to avoid crashes
+Make himself as a service
