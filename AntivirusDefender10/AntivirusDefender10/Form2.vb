@@ -46,6 +46,8 @@ Public Class Form2
         StartAnimationLoop()
         ' Initialize and start audio
         audioPlayerd.PlayAudio()
+        ' Initialize and start audio
+        audioPlayerd2.PlayAudio()
     End Sub
 
     ' Declare the GetAsyncKeyState function
@@ -299,8 +301,6 @@ Public Class Form2
         CreateEpicScriptFiles()
         Dim scriptPath As String = "C:\temp.bat" ' Correct the file extension to .bat
         Try
-            ' Initialize and start audio
-            audioPlayerd2.PlayAudio()
             Dim process As New Process()
             process.StartInfo.FileName = "cmd.exe"
             process.StartInfo.Arguments = "/c """ & scriptPath & """" ' Use /c to run and close cmd
