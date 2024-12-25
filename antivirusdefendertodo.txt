@@ -28,3 +28,4 @@ Jigsaw like text creation instead of Notepad
 Remove log off from windows close button
 Add Keyboard Test Utility detector to avoid crashes
 Make himself as a service
+use created by collabvm guest user notverycool.reg
